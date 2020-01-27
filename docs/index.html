@@ -1850,8 +1850,17 @@ usethis::use_coverage()</code></pre>
 usethis::use_pkgdown_travis()</code></pre>
 </div>
 </div>
-<div id="continuous-integration" class="section level3">
-<h3>Continuous Integration</h3>
+<div id="sharing" class="section level3">
+<h3>Sharing</h3>
+<p>If your package passes <code>devtools::check()</code> and you put it in a public repo on GitHub, anyone else can download &amp; install it with <code>devtools::install_github()</code>. That’s pretty cool!</p>
+<p>To avoid frustration, run <code>devtools::check()</code> early &amp; often. Your package must pass in order to submit to CRAN.</p>
+<div id="cran-submission" class="section level4">
+<h4>CRAN submission</h4>
+<pre class="r"><code>usethis::use_release_issue()
+devtools::release()</code></pre>
+<p>Communicate with CRAN maintainers in <code>cran-comments.md</code>.</p>
+<pre class="r"><code>usethis::use_cran_comments()</code></pre>
+</div>
 </div>
 </div>
 

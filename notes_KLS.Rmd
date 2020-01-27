@@ -460,4 +460,22 @@ usethis::use_pkgdown()
 usethis::use_pkgdown_travis()
 ```
 
-### Continuous Integration
+### Sharing
+
+If your package passes `devtools::check()` and you put it in a public repo on GitHub, anyone else can download & install it with `devtools::install_github()`.
+That's pretty cool!
+
+To avoid frustration, run `devtools::check()` early & often. 
+Your package must pass in order to submit to CRAN.
+
+#### CRAN submission
+
+```{r}
+usethis::use_release_issue()
+devtools::release()
+```
+
+Communicate with CRAN maintainers in `cran-comments.md`.
+```{r}
+usethis::use_cran_comments()
+```
