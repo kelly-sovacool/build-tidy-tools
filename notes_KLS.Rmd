@@ -8,7 +8,7 @@ output:
     toc_float: true
 ---
 ```{r render, eval=FALSE, echo=FALSE}
-rmarkdown::render('notes_KLS.Rmd', output_dir="docs")
+rmarkdown::render('notes_KLS.Rmd', output_file="docs/index.html")
 ```
 
 Taught by Charlotte & Hadley Wickham at `rstudio::conf(2020)`.
