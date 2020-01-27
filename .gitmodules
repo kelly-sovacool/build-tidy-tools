@@ -1,3 +1,6 @@
 [submodule "foofactors"]
 	path = foofactors
 	url = https://github.com/kelly-sovacool/foofactors
+[submodule "fordogs"]
+	path = fordogs
+	url = https://github.com/kelly-sovacool/fordogs
