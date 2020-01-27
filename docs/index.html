@@ -1814,13 +1814,12 @@ usethis::use_coverage()</code></pre>
 <li><code>R</code> then renders them into HTML so they look pretty in the Help pane.</li>
 </ul>
 <p>See more in the <a href="https://r-pkgs.org/man.html"><code>R Packages man chapter</code></a>.</p>
-</div>
-<div id="render-documentation" class="section level3">
-<h3>Render documentation</h3>
+<div id="render-documentation" class="section level4">
+<h4>Render documentation</h4>
 <p><code>devtools::document()</code> or <code>Cmd + Shift + D</code></p>
 </div>
-<div id="practice" class="section level3">
-<h3>Practice</h3>
+<div id="practice" class="section level4">
+<h4>Practice</h4>
 <p><strong>Now switching to the <code>fordogs</code> package.</strong></p>
 <ol style="list-style-type: decimal">
 <li>Fix the typos in the <code>fbind</code> function.</li>
@@ -1828,6 +1827,31 @@ usethis::use_coverage()</code></pre>
 <li>View the new doc: <code>?fbind</code>.</li>
 </ol>
 <p>Not every function in your package has to be available for users. For ones that are user-facing, include the <code>@export</code> tag.</p>
+<p>More practice: document the <code>fdist</code> function in <code>fordogs</code>.</p>
+</div>
+</div>
+<div id="vignettes" class="section level3">
+<h3>Vignettes</h3>
+<p>While <code>roxygen</code> comments document the individual components of the package, vignettes are for longer prose descriptions of how to use the package overall.</p>
+<pre class="r"><code>usethis::use_vignette(&quot;how-to&quot;)</code></pre>
+<div id="readme" class="section level4">
+<h4>README</h4>
+<p>A brief introduction; the bare minimum that someone needs to know when they come across your package. Also a nice landing page on GitHub.</p>
+<pre class="r"><code>usethis::use_readme_rmd()</code></pre>
+</div>
+<div id="news" class="section level4">
+<h4>News</h4>
+<p>To document user-facing changes (e.g. to the API).</p>
+<pre class="r"><code>usethis::use_news_md()</code></pre>
+</div>
+<div id="turn-the-docs-into-a-website-with-pkgdown" class="section level4">
+<h4>Turn the docs into a website with pkgdown</h4>
+<pre class="r"><code>usethis::use_pkgdown()
+usethis::use_pkgdown_travis()</code></pre>
+</div>
+</div>
+<div id="continuous-integration" class="section level3">
+<h3>Continuous Integration</h3>
 </div>
 </div>
 

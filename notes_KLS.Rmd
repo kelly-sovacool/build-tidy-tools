@@ -410,11 +410,11 @@ _**The hardest part about testing is writing the tests.**_
 
 See more in the [`R Packages man chapter`](https://r-pkgs.org/man.html).
 
-### Render documentation
+#### Render documentation
 
 `devtools::document()` or `Cmd + Shift + D`
 
-### Practice
+#### Practice
 
 **Now switching to the `fordogs` package.**
 
@@ -425,3 +425,39 @@ See more in the [`R Packages man chapter`](https://r-pkgs.org/man.html).
 
 Not every function in your package has to be available for users.
 For ones that are user-facing, include the `@export` tag.
+
+More practice: document the `fdist` function in `fordogs`.
+
+### Vignettes
+
+While `roxygen` comments document the individual components of the package,
+vignettes are for longer prose descriptions of how to use the package overall.
+
+```{r}
+usethis::use_vignette("how-to")
+```
+
+#### README
+
+A brief introduction; the bare minimum that someone needs to know when they come across your package. Also a nice landing page on GitHub.
+
+```{r}
+usethis::use_readme_rmd()
+```
+
+#### News
+
+To document user-facing changes (e.g. to the API).
+
+```{r}
+usethis::use_news_md()
+```
+
+#### Turn the docs into a website with pkgdown
+
+```{r}
+usethis::use_pkgdown()
+usethis::use_pkgdown_travis()
+```
+
+### Continuous Integration
