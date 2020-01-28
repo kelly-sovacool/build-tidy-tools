@@ -1925,12 +1925,12 @@ e$a</code></pre>
 <pre><code>## [1] 1</code></pre>
 <pre class="r"><code>#e[[1]] # doesn&#39;t work; unordered
 lobstr::obj_addr(e)</code></pre>
-<pre><code>## [1] &quot;0x7fcc5bf07f20&quot;</code></pre>
+<pre><code>## [1] &quot;0x7fcc58425620&quot;</code></pre>
 <pre class="r"><code>e$e &lt;- e  
 e$e</code></pre>
-<pre><code>## &lt;environment: 0x7fcc5bf07f20&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc58425620&gt;</code></pre>
 <pre class="r"><code>lobstr::obj_addr(e)  # e didn&#39;t get overwritten</code></pre>
-<pre><code>## [1] &quot;0x7fcc5bf07f20&quot;</code></pre>
+<pre><code>## [1] &quot;0x7fcc58425620&quot;</code></pre>
 <pre class="r"><code>## list
 l = list(a=1)
 l$l &lt;- l  # original list got overwritten
@@ -1942,9 +1942,9 @@ l</code></pre>
 ## $l$a
 ## [1] 1</code></pre>
 <pre class="r"><code>e</code></pre>
-<pre><code>## &lt;environment: 0x7fcc5bf07f20&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc58425620&gt;</code></pre>
 <pre class="r"><code>str(e)</code></pre>
-<pre><code>## &lt;environment: 0x7fcc5bf07f20&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc58425620&gt;</code></pre>
 <pre class="r"><code>ls(e)</code></pre>
 <pre><code>## [1] &quot;a&quot; &quot;e&quot;</code></pre>
 <pre class="r"><code>names(e)</code></pre>
@@ -1954,9 +1954,9 @@ l</code></pre>
 <pre class="r"><code>str(as.list(e))</code></pre>
 <pre><code>## List of 2
 ##  $ a: num 1
-##  $ e:&lt;environment: 0x7fcc5bf07f20&gt;</code></pre>
+##  $ e:&lt;environment: 0x7fcc58425620&gt;</code></pre>
 <pre class="r"><code>env_print(e)</code></pre>
-<pre><code>## &lt;environment: 0x7fcc5bf07f20&gt;
+<pre><code>## &lt;environment: 0x7fcc58425620&gt;
 ## parent: &lt;environment: global&gt;
 ## bindings:
 ##  * a: &lt;dbl&gt;
@@ -2001,7 +2001,7 @@ find_var(&quot;b&quot;, e1)
   }
 }
 find_env(&quot;a&quot;, e)</code></pre>
-<pre><code>## &lt;environment: 0x7fcc5bf07f20&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc58425620&gt;</code></pre>
 <pre class="r"><code># Returns e1
 find_env(&quot;find_env&quot;, e)</code></pre>
 <pre><code>## &lt;environment: R_GlobalEnv&gt;</code></pre>
@@ -2015,10 +2015,12 @@ find_env(&quot;sd&quot;, e)</code></pre>
 <pre class="r"><code># Returns stats pkg env</code></pre>
 <p>The sequence of envs R looks in:</p>
 <pre class="r"><code>search()</code></pre>
-<pre><code>##  [1] &quot;.GlobalEnv&quot;        &quot;package:rlang&quot;     &quot;package:dplyr&quot;     &quot;package:ggplot2&quot;  
-##  [5] &quot;tools:rstudio&quot;     &quot;package:stats&quot;     &quot;package:graphics&quot;  &quot;package:grDevices&quot;
-##  [9] &quot;package:utils&quot;     &quot;package:datasets&quot;  &quot;package:testthat&quot;  &quot;package:devtools&quot; 
-## [13] &quot;package:usethis&quot;   &quot;package:methods&quot;   &quot;Autoloads&quot;         &quot;package:base&quot;</code></pre>
+<pre><code>##  [1] &quot;.GlobalEnv&quot;        &quot;package:rlang&quot;     &quot;package:dplyr&quot;    
+##  [4] &quot;package:ggplot2&quot;   &quot;tools:rstudio&quot;     &quot;package:stats&quot;    
+##  [7] &quot;package:graphics&quot;  &quot;package:grDevices&quot; &quot;package:utils&quot;    
+## [10] &quot;package:datasets&quot;  &quot;package:testthat&quot;  &quot;package:devtools&quot; 
+## [13] &quot;package:usethis&quot;   &quot;package:methods&quot;   &quot;Autoloads&quot;        
+## [16] &quot;package:base&quot;</code></pre>
 <p>Does it take less time to find something in packages higher up in the search path? Yes. As you load more packages, it takes it a little bit longer to find packages. But it’s such a tiny differences it doesn’t affect your code that much.</p>
 <p>Back to the <code>sd</code> example:</p>
 <pre class="r"><code>sd</code></pre>
@@ -2466,6 +2468,176 @@ t(x)</code></pre>
 <p>Follow a style guide to <strong>be consistent</strong>, e.g. <a href="https://style.tidyverse.org/">tidyverse style guide</a>.</p>
 <p>Hadley’s greatest victory: Google’s R Style Guide is just the tidyverse style guide with some changes!</p>
 </div>
+<div id="argument-names" class="section level4">
+<h4>Argument Names</h4>
+<ul>
+<li>Be consistent.</li>
+<li>Use snake_case or camelCase to match your functions.</li>
+<li>Avoid dots.</li>
+</ul>
+</div>
+<div id="families-of-arguments" class="section level4">
+<h4>Families of Arguments</h4>
+<p>Can you group arguments together based on their intent or purpose? Or how often they’re used?</p>
+<ul>
+<li>data: primary input, positional &amp; required (<code>data</code>, <code>x</code>, <code>text</code>)</li>
+<li>descriptors / identifiers: usually positional but could be optional/named (<code>pattern</code>, <code>start</code>, <code>stop</code>)</li>
+<li>details / modifiers: optional &amp; named, change the behavior (<code>fixed</code>, <code>ignore.case</code>)</li>
+</ul>
+<p>The most important arguments (the data) should come earlier. Also makes your function work with the pipe.</p>
+<p>If you use <code>...</code> in your function, the details should come after <code>...</code></p>
+<p>For these functions, which args are required and which are optional?</p>
+<table>
+<colgroup>
+<col width="25%"></col>
+<col width="37%"></col>
+<col width="37%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th>function</th>
+<th>requried args</th>
+<th>opitonal args</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>lm()</code></td>
+<td><code>formula</code></td>
+<td><code>data</code>, <code>subset</code>, <code>weight</code>, …</td>
+</tr>
+<tr class="even">
+<td><code>sample()</code></td>
+<td><code>x</code></td>
+<td><code>size</code>, <code>replace</code>, <code>prob</code></td>
+</tr>
+<tr class="odd">
+<td><code>diag()</code></td>
+<td><code>nrow</code></td>
+<td><code>x</code>, <code>ncol</code>, <code>names</code></td>
+</tr>
+<tr class="even">
+<td><code>str_replace_all()</code></td>
+<td><code>string</code>, <code>pattern</code>, <code>replacement</code></td>
+<td>you can actually supply multiple replacements</td>
+</tr>
+</tbody>
+</table>
+<p>As a general rule of thumb, don’t do the above. Stick to:</p>
+<ul>
+<li>required = no default</li>
+<li>optional = has a default</li>
+</ul>
+<p>To implement anything besides the default, you have to use <code>missing()</code>. Just don’t do this. Exception: when you have a pair of mutually exclusive arguments (e.g. <code>read.table</code> can take a path to a file OR inline text; <code>forcats</code> function with <code>keep</code> and <code>drop</code>).</p>
+</div>
+<div id="hidden-arguments" class="section level4">
+<h4>Hidden Arguments</h4>
+<pre class="r"><code>options(stringsAsFactors = TRUE)
+data.frame(x = &quot;abc&quot;)  # x is fctr
+options(stringsAsFactors = FALSE)
+data.frame(x = &quot;abc&quot;)  # x is chr</code></pre>
+<pre class="r"><code># if you&#39;re in Turkey, tolower returns something different
+tolower(&quot;I&quot;)</code></pre>
+<pre><code>## [1] &quot;i&quot;</code></pre>
+<pre class="r"><code>stringr::str_to_lower(&quot;I&quot;, locale=&#39;tr&#39;)</code></pre>
+<pre><code>## [1] &quot;ı&quot;</code></pre>
+<pre class="r"><code># this behavior caused ggplot2 to not work for Turkish people</code></pre>
+<pre class="r"><code># not every alphabet organizes the letters in the same way
+sort(c(&#39;a&#39;, &#39;o&#39;, &#39;å&#39;, &#39;ø&#39;))</code></pre>
+<pre><code>## [1] &quot;a&quot; &quot;å&quot; &quot;o&quot; &quot;ø&quot;</code></pre>
+<pre class="r"><code># stringr defaults to English
+stringr::str_sort(c(&#39;a&#39;, &#39;o&#39;, &#39;å&#39;, &#39;ø&#39;))</code></pre>
+<pre><code>## [1] &quot;a&quot; &quot;å&quot; &quot;o&quot; &quot;ø&quot;</code></pre>
+<pre class="r"><code># in Swedish
+stringr::str_sort(c(&#39;a&#39;, &#39;o&#39;, &#39;å&#39;, &#39;ø&#39;), locale=&#39;se&#39;)</code></pre>
+<pre><code>## [1] &quot;a&quot; &quot;o&quot; &quot;ø&quot; &quot;å&quot;</code></pre>
+<pre class="r"><code># related to Bioinf software that behaved differently depending on OS file sorting</code></pre>
+<p>Since <code>stringr</code> &amp; <code>readr</code> have defaults for <code>locale</code> arg, the code will work the same way no matter where you’re running it.</p>
+<p>What do these functions have in common?</p>
+<ul>
+<li><code>trimws()</code></li>
+<li><code>stringr::str_trunc()</code></li>
+<li><code>rank()</code></li>
+</ul>
+<p>Options with a list of possible values, powered by <code>match.arg()</code> (supports partial matching) OR <code>rlang::arg_match()</code> (no partial matching).</p>
+</div>
+<div id="triple-dots-...-aka-ellipsis" class="section level4">
+<h4>Triple dots <code>...</code> (aka ellipsis)</h4>
+<p>Generally used when you’re passing on any number of arguments to another function.</p>
+<p>Common general usage pattern:</p>
+<pre class="r"><code>#&#39; @param ... all other args passed onto group_by
+count &lt;- function(df, ...) {
+  df %&gt;%
+    group_by(...) %&gt;%
+    summarize(n=n())
+}</code></pre>
+<p>Major downside:</p>
+<pre class="r"><code>sum(1,2,3)</code></pre>
+<pre><code>## [1] 6</code></pre>
+<pre class="r"><code>mean(1,2,3)</code></pre>
+<pre><code>## [1] 1</code></pre>
+<pre class="r"><code>weighted.mean(c(1,2,3), wt=c(1,0,0))  # actual arg name is `w`</code></pre>
+<pre><code>## [1] 2</code></pre>
+<p>Easy to accidentally swallow up additional positional or named arguments.</p>
+<p>Package <a href="https://github.com/r-lib/ellipsis"><code>ellipsis</code></a> is designed to protect you from the pitfalls.</p>
+<p>The development version of <code>dplyr</code> has new function <code>across()</code> to help expand variables that represent multiple data-variables for data masking semantics. Will obviate the need for <code>summarise_at()</code>, etc. This will be a lot better in ~3 months time. Put <code>dev</code> after the doc url to get to the dev version of the docs.</p>
+</div>
+</div>
+<div id="type-stability" class="section level3">
+<h3>Type stability</h3>
+<p>How easy is it to interpret the type of the object that a function returns?</p>
+<p><strong>What can you tell me about <code>x</code> and <code>y</code> knowing that this code works?</strong></p>
+<p><code>y &lt;- sum(x)</code></p>
+<ul>
+<li><code>x</code>: numeric or logical vector/matrix/array of any length.</li>
+<li><code>y</code>: numeric of length 1.</li>
+</ul>
+<pre class="r"><code>typeof(sum(c(.Machine$integer.max)))</code></pre>
+<pre><code>## [1] &quot;integer&quot;</code></pre>
+<pre class="r"><code>typeof(sum(c(1L, .Machine$integer.max)))</code></pre>
+<pre><code>## [1] &quot;double&quot;</code></pre>
+<p><strong>What can you tell me about <code>x</code> and <code>y</code> knowing that this code does not error?</strong></p>
+<p><code>y &lt;- mean(x)</code></p>
+<ul>
+<li><code>x</code>: absolutely nothing. <code>mean</code> throws a warning but not an error and returns <code>NA</code>.</li>
+<li><code>y</code>: length 1, normally numeric but sometimes is <code>NA</code>.</li>
+</ul>
+<p>Examples of dangerous things in base R:</p>
+<ul>
+<li><code>df[, i]</code>: most of the time it’ll be a data.frame, unless <code>i</code> is length 1, then it’ll be a vector.
+<ul>
+<li><code>df[i]</code>: but this always returns a data.frame.</li>
+</ul></li>
+<li><code>sapply(x, mean)</code>: could return a <code>list</code> or <code>numeric vector</code>.</li>
+</ul>
+<p>Keep your eye out for functions that sometimes return different types of objects. When writing your own functions, keep your types stable.</p>
+</div>
+<div id="organizing" class="section level3">
+<h3>Organizing</h3>
+<ul>
+<li>Can you give the package a short, evocative name?<br />
+</li>
+<li>Err on the side of too many things in your package, rather than too few, so you don’t have to remember which function is in which package.
+<ul>
+<li>But, it’s hard to undo this. e.g. <code>purrrlyr</code>.</li>
+</ul></li>
+<li>That’s why you can just <code>library(tidyverse)</code> and you don’t have to care about where stuff is when doing analyses.
+<ul>
+<li>Not recommend to do this in your own package…</li>
+<li>Normally you shouldn’t use the <code>depends</code> field in <code>DESCRIPTION</code>, but could be useful for creating metapackages.</li>
+</ul></li>
+</ul>
+</div>
+<div id="question-time" class="section level3">
+<h3>Question time</h3>
+<p>Hadley’s big goal: externalize the design principles so it scales. <a href="https://design.tidyverse.org" class="uri">https://design.tidyverse.org</a></p>
+<ul>
+<li>Maybe have a badge to identify ecosystem of tidyverse-compatible packages.</li>
+</ul>
+<p>Hadley’s greatest shame: <code>dplyr::recode</code>:</p>
+<pre class="r"><code>df %&gt;% mutate(new = old)  # how almost everything does it
+df %&gt;% rename(new = old)
+df %&gt;% recode(old = new)  # recode flips new &amp; old</code></pre>
 </div>
 </div>
 

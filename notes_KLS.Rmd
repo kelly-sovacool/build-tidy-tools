@@ -949,3 +949,155 @@ Hadley likes snake_case, but camelCase is fine.
 Follow a style guide to **be consistent**, e.g. [tidyverse style guide](https://style.tidyverse.org/).
 
 Hadley's greatest victory: Google's R Style Guide is just the tidyverse style guide with some changes! 
+
+#### Argument Names
+
+- Be consistent.
+- Use snake_case or camelCase to match your functions.
+- Avoid dots.
+
+#### Families of Arguments
+
+Can you group arguments together based on their intent or purpose? Or how often they're used?
+
+- data: primary input, positional & required (`data`, `x`, `text`)
+- descriptors / identifiers: usually positional but could be optional/named (`pattern`, `start`, `stop`)
+- details / modifiers: optional & named, change the behavior (`fixed`, `ignore.case`)
+
+The most important arguments (the data) should come earlier. Also makes your function work with the pipe.
+
+If you use `...` in your function, the details should come after `...`
+
+For these functions, which args are required and which are optional?
+
+| function | requried args | opitonal args |
+|----------|---------------|---------------|
+| `lm()`   | `formula` | `data`, `subset`, `weight`, ... |
+| `sample()` | `x`     | `size`, `replace`, `prob`       |
+| `diag()` | `nrow`        | `x`, `ncol`, `names` |
+| `str_replace_all()` | `string`, `pattern`, `replacement`  | you can actually supply multiple replacements  |
+
+As a general rule of thumb, don't do the above. Stick to:
+
+- required = no default
+- optional = has a default
+
+To implement anything besides the default, you have to use `missing()`. Just don't do this. Exception: when you have a pair of mutually exclusive arguments (e.g. `read.table` can take a path to a file OR inline text; `forcats` function with `keep` and `drop`). 
+
+#### Hidden Arguments
+
+```{r, eval=TRUE}
+options(stringsAsFactors = TRUE)
+data.frame(x = "abc")  # x is fctr
+options(stringsAsFactors = FALSE)
+data.frame(x = "abc")  # x is chr
+```
+
+```{r, eval=TRUE}
+# if you're in Turkey, tolower returns something different
+tolower("I")
+stringr::str_to_lower("I", locale='tr')
+# this behavior caused ggplot2 to not work for Turkish people
+```
+
+```{r, eval=TRUE}
+# not every alphabet organizes the letters in the same way
+sort(c('a', 'o', 'å', 'ø'))
+# stringr defaults to English
+stringr::str_sort(c('a', 'o', 'å', 'ø'))
+# in Swedish
+stringr::str_sort(c('a', 'o', 'å', 'ø'), locale='se')
+# related to Bioinf software that behaved differently depending on OS file sorting
+```
+
+Since `stringr` & `readr` have defaults for `locale` arg, the code will work the same way no matter where you're running it.
+
+What do these functions have in common?
+
+- `trimws()`
+- `stringr::str_trunc()`
+- `rank()`
+
+Options with a list of possible values, powered by `match.arg()` (supports partial matching) OR `rlang::arg_match()` (no partial matching).
+
+#### Triple dots `...` (aka ellipsis)
+
+Generally used when you're passing on any number of arguments to another function.
+
+Common general usage pattern:
+```{r}
+#' @param ... all other args passed onto group_by
+count <- function(df, ...) {
+  df %>%
+    group_by(...) %>%
+    summarize(n=n())
+}
+```
+
+Major downside:
+```{r, eval=TRUE}
+sum(1,2,3)
+mean(1,2,3)
+weighted.mean(c(1,2,3), wt=c(1,0,0))  # actual arg name is `w`
+```
+
+Easy to accidentally swallow up additional positional or named arguments.
+
+Package [`ellipsis`](https://github.com/r-lib/ellipsis) is designed to protect you from the pitfalls.
+
+The development version of `dplyr` has new function `across()` to help expand variables that represent multiple data-variables for data masking semantics.
+Will obviate the need for `summarise_at()`, etc. This will be a lot better in ~3 months time. Put `dev` after the doc url to get to the dev version of the docs.
+
+### Type stability
+
+How easy is it to interpret the type of the object that a function returns?
+
+**What can you tell me about `x` and `y` knowing that this code works?**
+
+`y <- sum(x)`
+
+- `x`: numeric or logical vector/matrix/array of any length.
+- `y`: numeric of length 1.
+
+```{r, eval=TRUE}
+typeof(sum(c(.Machine$integer.max)))
+typeof(sum(c(1L, .Machine$integer.max)))
+```
+
+
+**What can you tell me about `x` and `y` knowing that this code does not error?**
+
+`y <- mean(x)`
+
+- `x`: absolutely nothing. `mean` throws a warning but not an error and returns `NA`.
+- `y`: length 1, normally numeric but sometimes is `NA`.
+
+Examples of dangerous things in base R:
+
+- `df[, i]`: most of the time it'll be a data.frame, unless `i` is length 1, then it'll be a vector.
+  - `df[i]`: but this always returns a data.frame.
+- `sapply(x, mean)`: could return a `list` or `numeric vector`.
+
+Keep your eye out for functions that sometimes return different types of objects. When writing your own functions, keep your types stable.
+
+### Organizing
+
+- Can you give the package a short, evocative name?  
+- Err on the side of too many things in your package, rather than too few, so you don't have to remember which function is in which package.
+  - But, it's hard to undo this. e.g. `purrrlyr`.
+- That's why you can just `library(tidyverse)` and you don't have to care about where stuff is when doing analyses.
+  - Not recommend to do this in your own package...
+  - Normally you shouldn't use the `depends` field in `DESCRIPTION`, but could be useful for creating metapackages.
+
+### Question time
+
+Hadley's big goal: externalize the design principles so it scales. <https://design.tidyverse.org>
+
+- Maybe have a badge to identify ecosystem of tidyverse-compatible packages.
+
+Hadley's greatest shame: `dplyr::recode`:
+```{r}
+df %>% mutate(new = old)  # how almost everything does it
+df %>% rename(new = old)
+df %>% recode(old = new)  # recode flips new & old
+```
