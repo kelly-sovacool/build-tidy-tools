@@ -1863,6 +1863,369 @@ devtools::release()</code></pre>
 </div>
 </div>
 </div>
+<div id="dependencies" class="section level2">
+<h2>Dependencies</h2>
+<p>How to use code from other packages, when to use code from other packages, and when not to use code from other packages.</p>
+<div id="motivation" class="section level3">
+<h3>Motivation</h3>
+<p>While the code of these functions is similar, it’s the <strong>environment</strong> that’s different.</p>
+<pre class="r"><code>?sd
+x &lt;- 1:10
+sd(x)</code></pre>
+<pre><code>## [1] 3.02765</code></pre>
+<pre class="r"><code># 3.02765
+
+var &lt;- function(x) 100
+sd(x)</code></pre>
+<pre><code>## [1] 3.02765</code></pre>
+<pre class="r"><code># 3.02765
+
+my_sd &lt;- function(x) sqrt(var(x))
+my_sd(x)</code></pre>
+<pre><code>## [1] 10</code></pre>
+<pre class="r"><code># 10</code></pre>
+</div>
+<div id="warm-ups" class="section level3">
+<h3>Warm-ups</h3>
+</div>
+<div id="lexical-scoping" class="section level3">
+<h3>Lexical scoping</h3>
+<p>If R can’t find the variable in the current environment, it goes up a level until it can.</p>
+</div>
+<div id="environments" class="section level3">
+<h3>Environments</h3>
+<ul>
+<li>What is an environment?
+<ul>
+<li>collection.</li>
+<li>mapping from names to objects.</li>
+<li>hierarchy - every environment has a parent.</li>
+<li>data structure that powers scoping.</li>
+<li>can use environments as dictionaries/hashmaps.</li>
+</ul></li>
+<li>How is an environment different from a list?
+<ul>
+<li>environments can’t really have classes (actually they can put that’s not a good idea).</li>
+<li>environments have parents.</li>
+<li>environments are unordered.</li>
+<li>overall, environments are really weird.</li>
+<li>environments never get copied.</li>
+</ul></li>
+<li>How can you see the contents of an environment?
+<ul>
+<li><code>rlang::env_print(e)</code></li>
+<li>if you got rid of environments (+ a few other smaller things), you’d basically end up with Python. (Which isn’t bad, just not R.)</li>
+</ul></li>
+</ul>
+<pre class="r"><code>library(rlang)
+## env
+e &lt;- env()
+e$a &lt;- 1
+e$a</code></pre>
+<pre><code>## [1] 1</code></pre>
+<pre class="r"><code>#e[[1]] # doesn&#39;t work; unordered
+lobstr::obj_addr(e)</code></pre>
+<pre><code>## [1] &quot;0x7fd65b01fbd0&quot;</code></pre>
+<pre class="r"><code>e$e &lt;- e  
+e$e</code></pre>
+<pre><code>## &lt;environment: 0x7fd65b01fbd0&gt;</code></pre>
+<pre class="r"><code>lobstr::obj_addr(e)  # e didn&#39;t get overwritten</code></pre>
+<pre><code>## [1] &quot;0x7fd65b01fbd0&quot;</code></pre>
+<pre class="r"><code>## list
+l = list(a=1)
+l$l &lt;- l  # original list got overwritten
+l</code></pre>
+<pre><code>## $a
+## [1] 1
+## 
+## $l
+## $l$a
+## [1] 1</code></pre>
+<pre class="r"><code>e</code></pre>
+<pre><code>## &lt;environment: 0x7fd65b01fbd0&gt;</code></pre>
+<pre class="r"><code>str(e)</code></pre>
+<pre><code>## &lt;environment: 0x7fd65b01fbd0&gt;</code></pre>
+<pre class="r"><code>ls(e)</code></pre>
+<pre><code>## [1] &quot;a&quot; &quot;e&quot;</code></pre>
+<pre class="r"><code>names(e)</code></pre>
+<pre><code>## [1] &quot;a&quot; &quot;e&quot;</code></pre>
+<pre class="r"><code>str(e$a)</code></pre>
+<pre><code>##  num 1</code></pre>
+<pre class="r"><code>str(as.list(e))</code></pre>
+<pre><code>## List of 2
+##  $ a: num 1
+##  $ e:&lt;environment: 0x7fd65b01fbd0&gt;</code></pre>
+<pre class="r"><code>env_print(e)</code></pre>
+<pre><code>## &lt;environment: 0x7fd65b01fbd0&gt;
+## parent: &lt;environment: global&gt;
+## bindings:
+##  * a: &lt;dbl&gt;
+##  * e: &lt;env&gt;</code></pre>
+</div>
+<div id="scoping-example" class="section level3">
+<h3>Scoping example</h3>
+<pre class="r"><code>find_var &lt;- function(name, env) {
+  if (env_has(env, name)) {
+    env_get(env, name)
+  } else {
+    find_var(name, env_parent(env))
+  }
+}
+
+e1 &lt;- env()
+e1$a &lt;- 1
+find_var(&quot;a&quot;, e1)
+find_var(&quot;b&quot;, e1)
+# Error: empty env has no parent</code></pre>
+<p>This approximates what <code>R</code> does to find a variable in an environment</p>
+<pre class="r"><code>find_var &lt;- function(name, env) {
+  if (identical(env, empty_env())){
+    stop(&quot;Object &#39;&quot;, name, &quot;&#39; not found&quot;)
+  } else if (env_has(env, name)) {
+    env_get(env, name)
+  } else {
+    find_var(name, env_parent(env))
+  }
+}
+find_var(&quot;a&quot;, e1)
+find_var(&quot;b&quot;, e1)
+# Error: Object &#39;b&#39; not found</code></pre>
+<p>Let’s do something a bit more useful: instead of returning the variable, try returning the environment.</p>
+<pre class="r"><code>find_env &lt;- function(name, env) {
+  if (identical(env, empty_env())){
+    stop(&quot;Object &#39;&quot;, name, &quot;&#39; not found&quot;)
+  } else if (env_has(env, name)) {
+    env
+  } else {
+    find_env(name, env_parent(env))
+  }
+}
+find_env(&quot;a&quot;, e)</code></pre>
+<pre><code>## &lt;environment: 0x7fd65b01fbd0&gt;</code></pre>
+<pre class="r"><code># Returns e1
+find_env(&quot;find_env&quot;, e)</code></pre>
+<pre><code>## &lt;environment: R_GlobalEnv&gt;</code></pre>
+<pre class="r"><code># Returns global environment
+find_env(&quot;sd&quot;, e)</code></pre>
+<pre><code>## &lt;environment: package:stats&gt;
+## attr(,&quot;name&quot;)
+## [1] &quot;package:stats&quot;
+## attr(,&quot;path&quot;)
+## [1] &quot;/Library/Frameworks/R.framework/Versions/3.6/Resources/library/stats&quot;</code></pre>
+<pre class="r"><code># Returns stats pkg env</code></pre>
+<p>The sequence of envs R looks in:</p>
+<pre class="r"><code>search()</code></pre>
+<pre><code>##  [1] &quot;.GlobalEnv&quot;        &quot;package:rlang&quot;     &quot;tools:rstudio&quot;     &quot;package:stats&quot;    
+##  [5] &quot;package:graphics&quot;  &quot;package:grDevices&quot; &quot;package:utils&quot;     &quot;package:datasets&quot; 
+##  [9] &quot;package:testthat&quot;  &quot;package:devtools&quot;  &quot;package:usethis&quot;   &quot;package:methods&quot;  
+## [13] &quot;Autoloads&quot;         &quot;package:base&quot;</code></pre>
+<p>Does it take less time to find something in packages higher up in the search path? Yes. As you load more packages, it takes it a little bit longer to find packages. But it’s such a tiny differences it doesn’t affect your code that much.</p>
+<p>Back to the <code>sd</code> example:</p>
+<pre class="r"><code>sd</code></pre>
+<pre><code>## function (x, na.rm = FALSE) 
+## sqrt(var(if (is.vector(x) || is.factor(x)) x else as.double(x), 
+##     na.rm = na.rm))
+## &lt;bytecode: 0x7fd653244640&gt;
+## &lt;environment: namespace:stats&gt;</code></pre>
+<pre class="r"><code>find_env(&quot;var&quot;, environment(sd))</code></pre>
+<pre><code>## &lt;environment: namespace:stats&gt;</code></pre>
+<pre class="r"><code># in the stats package
+
+my_sd</code></pre>
+<pre><code>## function(x) sqrt(var(x))</code></pre>
+<pre class="r"><code>find_env(&quot;var&quot;, environment(my_sd))</code></pre>
+<pre><code>## &lt;environment: R_GlobalEnv&gt;</code></pre>
+<pre class="r"><code># in the Global env</code></pre>
+<p>R version 3.0 introduced the concept of Namespaces to make sure packages play nicely with each other.</p>
+</div>
+<div id="comparing-environments" class="section level3">
+<h3>Comparing environments</h3>
+<pre class="r"><code>get_env(ggplot2::geom_point)
+get_env(dplyr::mutate)
+get_env(MASS::select)</code></pre>
+<ul>
+<li>What do these environments have in common?</li>
+<li>What’s different?</li>
+<li>Tools to answer these questions: <code>env_print()</code>; <code>env_parent()</code>; <code>env_parents()</code></li>
+</ul>
+<pre class="r"><code>env_print(get_env(ggplot2::geom_point))</code></pre>
+<pre><code>## &lt;environment: namespace:ggplot2&gt; [L]
+## parent: &lt;environment: imports:ggplot2&gt;
+## bindings:
+##  * theta_rescale_no_clip: &lt;lazy&gt; [L]
+##  * indent: &lt;lazy&gt; [L]
+##  * fortify.cld: &lt;lazy&gt; [L]
+##  * predictdf.glm: &lt;lazy&gt; [L]
+##  * standardise_aes_names: &lt;fn&gt; [L]
+##  * find_panel: &lt;fn&gt; [L]
+##  * facet_wrap: &lt;fn&gt; [L]
+##  * geom_label: &lt;fn&gt; [L]
+##  * StatSmooth: &lt;S3: StatSmooth&gt; [L]
+##  * aes_q: &lt;fn&gt; [L]
+##  * label_variable: &lt;lazy&gt; [L]
+##  * labeller: &lt;fn&gt; [L]
+##  * calc_logticks: &lt;lazy&gt; [L]
+##  * ggplot_add: &lt;fn&gt; [L]
+##  * element_grob.element_text: &lt;lazy&gt; [L]
+##  * StatSummary2d: &lt;S3: StatSummary2d&gt; [L]
+##  * GeomMap: &lt;S3: GeomMap&gt; [L]
+##  * `$.ggproto_parent`: &lt;lazy&gt; [L]
+##  * scale_color_manual: &lt;fn&gt; [L]
+##  * parse_safe: &lt;lazy&gt; [L]
+##    * ... with 834 more bindings</code></pre>
+<pre class="r"><code>env_print(get_env(dplyr::mutate))</code></pre>
+<pre><code>## &lt;environment: namespace:dplyr&gt; [L]
+## parent: &lt;environment: imports:dplyr&gt;
+## bindings:
+##  * db_desc: &lt;fn&gt; [L]
+##  * check_suffix: &lt;lazy&gt; [L]
+##  * warn_deprecated: &lt;lazy&gt; [L]
+##  * select.tbl_cube: &lt;lazy&gt; [L]
+##  * groups.grouped_df: &lt;lazy&gt; [L]
+##  * bad_pos_args: &lt;lazy&gt; [L]
+##  * fmt_wrong_eq_ops: &lt;lazy&gt; [L]
+##  * `_dplyr_inner_join_impl`: &lt;S3: CallRoutine&gt; [L]
+##  * mutate_.data.frame: &lt;lazy&gt; [L]
+##  * env_bind_do_pronouns: &lt;lazy&gt; [L]
+##  * funs_: &lt;fn&gt; [L]
+##  * distinct_if: &lt;fn&gt; [L]
+##  * map2_int: &lt;lazy&gt; [L]
+##  * ident: &lt;fn&gt; [L]
+##  * wrap: &lt;lazy&gt; [L]
+##  * group_by.tbl_cube: &lt;lazy&gt; [L]
+##  * group_nest: &lt;fn&gt; [L]
+##  * reconstruct_set: &lt;lazy&gt; [L]
+##  * `_dplyr_intersect_data_frame`: &lt;S3: CallRoutine&gt; [L]
+##  * test_matches: &lt;lazy&gt; [L]
+##    * ... with 744 more bindings</code></pre>
+<pre class="r"><code>env_print(get_env(MASS::select))</code></pre>
+<pre><code>## &lt;environment: namespace:MASS&gt; [L]
+## parent: &lt;environment: imports:MASS&gt;
+## bindings:
+##  * addterm.survreg: &lt;lazy&gt; [L]
+##  * print.anova.loglm: &lt;lazy&gt; [L]
+##  * logLik.polr: &lt;lazy&gt; [L]
+##  * confint.profile.nls: &lt;lazy&gt; [L]
+##  * qda.data.frame: &lt;lazy&gt; [L]
+##  * predict.lda: &lt;lazy&gt; [L]
+##  * dropterm.mlm: &lt;lazy&gt; [L]
+##  * corresp.formula: &lt;lazy&gt; [L]
+##  * .__S3MethodsTable__.: &lt;env&gt; [L]
+##  * VR_phi4_bin: &lt;S3: CRoutine&gt; [L]
+##  * rational: &lt;fn&gt; [L]
+##  * family.negbin: &lt;lazy&gt; [L]
+##  * .Diag: &lt;lazy&gt; [L]
+##  * ucv: &lt;fn&gt; [L]
+##  * print.abbrev: &lt;lazy&gt; [L]
+##  * renumerate: &lt;fn&gt; [L]
+##  * negative.binomial: &lt;fn&gt; [L]
+##  * lda.formula: &lt;lazy&gt; [L]
+##  * dose.p: &lt;fn&gt; [L]
+##  * fitted.loglm: &lt;lazy&gt; [L]
+##    * ... with 212 more bindings</code></pre>
+<p><code>env_print</code> shows all the packages functions, including ones that aren’t exported (can use triple colons <code>:::</code> to access them).</p>
+<pre class="r"><code>env_parent(get_env(ggplot2::geom_point))</code></pre>
+<pre><code>## &lt;environment: 0x7fd65d33e940&gt;
+## attr(,&quot;name&quot;)
+## [1] &quot;imports:ggplot2&quot;</code></pre>
+<pre class="r"><code>env_parent(get_env(dplyr::mutate))</code></pre>
+<pre><code>## &lt;environment: 0x7fd65fd0b2b0&gt;
+## attr(,&quot;name&quot;)
+## [1] &quot;imports:dplyr&quot;</code></pre>
+<pre class="r"><code>env_parent(get_env(MASS::select))</code></pre>
+<pre><code>## &lt;environment: 0x7fd640810ee8&gt;
+## attr(,&quot;name&quot;)
+## [1] &quot;imports:MASS&quot;</code></pre>
+<p>``<code>env_parent</code>: just get the immediate parent.</p>
+<pre class="r"><code>env_parents(get_env(ggplot2::geom_point))</code></pre>
+<pre><code>## [[1]] $ &lt;env: imports:ggplot2&gt;
+## [[2]] $ &lt;env: namespace:base&gt;
+## [[3]] $ &lt;env: global&gt;</code></pre>
+<pre class="r"><code>env_parents(get_env(dplyr::mutate))</code></pre>
+<pre><code>## [[1]] $ &lt;env: imports:dplyr&gt;
+## [[2]] $ &lt;env: namespace:base&gt;
+## [[3]] $ &lt;env: global&gt;</code></pre>
+<pre class="r"><code>env_parents(get_env(MASS::select))</code></pre>
+<pre><code>## [[1]] $ &lt;env: imports:MASS&gt;
+## [[2]] $ &lt;env: namespace:base&gt;
+## [[3]] $ &lt;env: global&gt;</code></pre>
+<p><code>env_parents</code>: recursively gets parents</p>
+<ul>
+<li>What do these environments have in common?
+<ul>
+<li>They’re all namespaces.</li>
+<li>They share grandparents &amp; great-grandparents.</li>
+</ul></li>
+<li>What’s different?
+<ul>
+<li>They have different parents.</li>
+</ul></li>
+</ul>
+<pre class="r"><code>lobstr::obj_addr(env_parent(get_env(ggplot2::geom_point))$grid.set)</code></pre>
+<pre><code>## [1] &quot;0x7fd6569b0b60&quot;</code></pre>
+<pre class="r"><code>lobstr::obj_addr(grid::grid.set)</code></pre>
+<pre><code>## [1] &quot;0x7fd6569b0b60&quot;</code></pre>
+<p>When using functions from other packages, INCLUDING DEFAULT PACKAGES (but not <code>base</code>), need to call it explicitly or use the <code>importFrom</code> tag in the <code>Roxygen</code> comment.</p>
+<p>Option A:</p>
+<pre class="r"><code>my_sd &lt;- function(x) sqrt(stats::var(x))</code></pre>
+<p>Option B:</p>
+<pre class="r"><code>#&#39; @importFrom stats var
+my_sd &lt;- function(x) sqrt(var(x))</code></pre>
+<div id="exercise-importing-default-packages" class="section level4">
+<h4>Exercise: importing default packages</h4>
+<ul>
+<li><code>create_package(&quot;ns&quot;)</code></li>
+<li><code>use_mit_license</code></li>
+<li><code>use_r(&quot;my_sd&quot;)</code></li>
+<li>write the function &amp; documentation</li>
+<li>run <code>document()</code> and <code>check()</code></li>
+<li>fix the note</li>
+</ul>
+</div>
+<div id="non-default-packages" class="section level4">
+<h4>non-default packages</h4>
+<p>For non-default packages, also need to add them to the DESCRIPTION file.</p>
+<pre class="r"><code>use_package(&quot;tibble&quot;)
+use_package(&quot;dplyr&quot;)</code></pre>
+</div>
+<div id="the-conflicted-package" class="section level4">
+<h4>The conflicted package</h4>
+<p><a href="https://github.com/r-lib/conflicted">r-lib/conflicted</a></p>
+<p>Makes all conflicts errors. e.g. There’s a filter in both base &amp; dplyr; it will force you to pick one.</p>
+</div>
+</div>
+<div id="colon-colon-vs-importfrom-vs-others" class="section level3">
+<h3>Colon-Colon vs importFrom vs others</h3>
+<div id="colon-colon" class="section level4">
+<h4>Colon-Colon <code>::</code></h4>
+<pre class="r"><code>dplyr::filter()</code></pre>
+<p>This should be your default MO, because this makes it obvious that you’re calling a function outside the package.</p>
+<p>But there are downsides:</p>
+<ol style="list-style-type: decimal">
+<li>it’s verbose. gets annoying to type.</li>
+<li>you can’t do this: <code>magrittr::%&gt;%</code> (it’s an infix operator).</li>
+</ol>
+</div>
+<div id="importfrom" class="section level4">
+<h4>importFrom</h4>
+<pre class="r"><code>#&#39; @importFrom pkg fun1</code></pre>
+<ol style="list-style-type: decimal">
+<li>For when you get annoyed with the verbosity of <code>::</code>.</li>
+<li>For when you need to import the pipe or other infix operators.</li>
+</ol>
+</div>
+<div id="import-everything-from-a-package" class="section level4">
+<h4>import everything from a package</h4>
+<pre class="r"><code>#&#39; @import pkg</code></pre>
+<p>Be careful about when you do this.</p>
+</div>
+<div id="dont-do-this" class="section level4">
+<h4>DON’T DO THIS</h4>
+<pre class="r"><code>`%&lt;%` &lt;- magrittr::`%&lt;%`</code></pre>
+<p>Unless you really enjoy suffering. Hadley once spent six months debugging issues caused by this!</p>
+</div>
+</div>
+</div>
 
 
 
