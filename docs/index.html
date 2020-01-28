@@ -1917,25 +1917,20 @@ my_sd(x)</code></pre>
 <li>if you got rid of environments (+ a few other smaller things), you’d basically end up with Python. (Which isn’t bad, just not R.)</li>
 </ul></li>
 </ul>
-<pre class="r"><code>library(rlang)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;rlang&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:testthat&#39;:
-## 
-##     is_false, is_null, is_true</code></pre>
-<pre class="r"><code>## env
+<pre class="r"><code>library(rlang)
+## env
 e &lt;- env()
 e$a &lt;- 1
 e$a</code></pre>
 <pre><code>## [1] 1</code></pre>
 <pre class="r"><code>#e[[1]] # doesn&#39;t work; unordered
 lobstr::obj_addr(e)</code></pre>
-<pre><code>## [1] &quot;0x7fcc59c2cdc0&quot;</code></pre>
+<pre><code>## [1] &quot;0x7fcc5bf07f20&quot;</code></pre>
 <pre class="r"><code>e$e &lt;- e  
 e$e</code></pre>
-<pre><code>## &lt;environment: 0x7fcc59c2cdc0&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc5bf07f20&gt;</code></pre>
 <pre class="r"><code>lobstr::obj_addr(e)  # e didn&#39;t get overwritten</code></pre>
-<pre><code>## [1] &quot;0x7fcc59c2cdc0&quot;</code></pre>
+<pre><code>## [1] &quot;0x7fcc5bf07f20&quot;</code></pre>
 <pre class="r"><code>## list
 l = list(a=1)
 l$l &lt;- l  # original list got overwritten
@@ -1947,9 +1942,9 @@ l</code></pre>
 ## $l$a
 ## [1] 1</code></pre>
 <pre class="r"><code>e</code></pre>
-<pre><code>## &lt;environment: 0x7fcc59c2cdc0&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc5bf07f20&gt;</code></pre>
 <pre class="r"><code>str(e)</code></pre>
-<pre><code>## &lt;environment: 0x7fcc59c2cdc0&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc5bf07f20&gt;</code></pre>
 <pre class="r"><code>ls(e)</code></pre>
 <pre><code>## [1] &quot;a&quot; &quot;e&quot;</code></pre>
 <pre class="r"><code>names(e)</code></pre>
@@ -1959,9 +1954,9 @@ l</code></pre>
 <pre class="r"><code>str(as.list(e))</code></pre>
 <pre><code>## List of 2
 ##  $ a: num 1
-##  $ e:&lt;environment: 0x7fcc59c2cdc0&gt;</code></pre>
+##  $ e:&lt;environment: 0x7fcc5bf07f20&gt;</code></pre>
 <pre class="r"><code>env_print(e)</code></pre>
-<pre><code>## &lt;environment: 0x7fcc59c2cdc0&gt;
+<pre><code>## &lt;environment: 0x7fcc5bf07f20&gt;
 ## parent: &lt;environment: global&gt;
 ## bindings:
 ##  * a: &lt;dbl&gt;
@@ -2006,7 +2001,7 @@ find_var(&quot;b&quot;, e1)
   }
 }
 find_env(&quot;a&quot;, e)</code></pre>
-<pre><code>## &lt;environment: 0x7fcc59c2cdc0&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc5bf07f20&gt;</code></pre>
 <pre class="r"><code># Returns e1
 find_env(&quot;find_env&quot;, e)</code></pre>
 <pre><code>## &lt;environment: R_GlobalEnv&gt;</code></pre>
@@ -2229,6 +2224,17 @@ use_package(&quot;dplyr&quot;)</code></pre>
 <pre class="r"><code>`%&lt;%` &lt;- magrittr::`%&lt;%`</code></pre>
 <p>Unless you really enjoy suffering. Hadley once spent six months debugging issues caused by this!</p>
 </div>
+<div id="use_package_doc" class="section level4">
+<h4>use_package_doc</h4>
+<p><code>@importFrom</code> makes them available to everything in your package, not just that function. A better practice is to make a place to put all of your <code>@importFrom</code> tags or other global roxygen commands. Use <code>usethis::use_package_doc()</code>.</p>
+</div>
+</div>
+<div id="namespace-vs.-description" class="section level3">
+<h3>NAMESPACE vs. DESCRIPTION</h3>
+<ul>
+<li><code>NAMESPACE</code>: about functions; managed completely by <code>roxygen2</code> (don’t edit manually).</li>
+<li><code>DESCRIPTION</code>: about the package; managed by <code>usethis</code> and <em>you</em> (manually).</li>
+</ul>
 </div>
 </div>
 <div id="tidyverse-in-packages" class="section level2">
@@ -2282,7 +2288,184 @@ starwars[starwars$homeworld == &quot;Naboo&quot; &amp; starwars$species == &quot
 <ul>
 <li>Preface data-variables inside your function with the <code>.data</code> pronoun from the <code>rlang</code> package, then refer to them like <code>.data$var</code>.</li>
 <li>Use the tidy eval operator <code>{{ var }}</code> (‘embracing’) to pass column names as variables to functions, OR pass it as a string and use <code>.data[[var]]</code>. Prefer the embracing solution, it’s prettier!</li>
+<li>You can use the dots (<code>...</code>) arg to pass multiple vars, e.g.:</li>
 </ul>
+<pre class="r"><code>group_summary &lt;- function(df, x, ...) {
+    df %&gt;%
+        group_by(...) %&gt;%
+        summarise(
+            n = n(),
+            min = min({{ x }}, na.rm = TRUE),
+            max = max({{ x }}, na.rm = TRUE)
+        )
+}</code></pre>
+<p>(Question: how would you document the <code>...</code> arg in the roxygen comment?)</p>
+<p>See <a href="https://ggplot2.tidyverse.org/dev/articles/ggplot2-in-packages.html#using-aes-and-vars-in-a-package-function">this article</a> for more examples.</p>
+<p>Hadley: the two curly braces are magic, they don’t live anywhere. They are interpreted by tidyverse packages that use data masking (started about 6 months ago). Helps so programmers don’t have to learn the theory underlying it (<code>enquo()</code> and <code>!!</code>); makes tidy eval more accessible.</p>
+</div>
+</div>
+<div id="interface" class="section level2">
+<h2>Interface</h2>
+<ul>
+<li><p>interface: outside of function</p></li>
+<li><p>implementation: inside of function</p></li>
+<li><p>The Tidyverse tries to have consistent interfaces across their function designs.</p></li>
+<li><p>Book in progress: <a href="https://design.tidyverse.org/">Tidyverse design guide</a></p>
+<ul>
+<li>Probably at least 3 years away from completion.</li>
+<li>When they discover a recurring pattern, they document it.</li>
+</ul></li>
+</ul>
+<p>What are the properties of a function that define its interface (there are &gt;= 9)?</p>
+<ul>
+<li>Name of the function</li>
+<li>Params / arguments / inputs
+<ul>
+<li>names &amp; order</li>
+<li>number of args</li>
+<li>types</li>
+<li>default values / required vs optional</li>
+<li>evaluation (regular, NSE, tidy eval)</li>
+</ul></li>
+<li>Output: what it returns</li>
+<li>Conditions
+<ul>
+<li>Errors</li>
+<li>Warnings</li>
+<li>Messages</li>
+</ul></li>
+<li>Side effects, e.g.
+<ul>
+<li>print</li>
+<li>make a plot</li>
+<li>disk I/O</li>
+<li>change the random seed</li>
+</ul></li>
+<li>Environment that it’s in?</li>
+</ul>
+<div id="case-study-regular-expressions-string-manipulation" class="section level3">
+<h3>Case study: regular expressions / string manipulation</h3>
+<p><code>stringr</code> vs. base R</p>
+<p>Lots of inconsistencies in the interfaces for base R functions related to regex &amp; string manipulation.</p>
+</div>
+<div id="names" class="section level3">
+<h3>Names</h3>
+<div id="functions-should-be-verbs-usually" class="section level4">
+<h4>Functions should be verbs (usually)</h4>
+<table>
+<thead>
+<tr class="header">
+<th><code>base R</code></th>
+<th><code>stringr</code></th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>grepl()</code></td>
+<td><code>str_detect()</code></td>
+<td>returns logical vector</td>
+</tr>
+<tr class="even">
+<td><code>grep()</code></td>
+<td><code>str_which()</code></td>
+<td>returns location (integer vector)</td>
+</tr>
+<tr class="odd">
+<td><code>grep(value = TRUE)</code></td>
+<td><code>str_subset()</code></td>
+<td>returns value (character vector)</td>
+</tr>
+<tr class="even">
+<td><code>sub()</code></td>
+<td><code>str_replace()</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>gsub()</code></td>
+<td><code>str_replace_all()</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>strsplit()</code></td>
+<td><code>str_split()</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>regexpr()</code></td>
+<td><code>str_locate()</code></td>
+<td>returns location of pattern within string</td>
+</tr>
+</tbody>
+</table>
+<p>(More details in the <a href="https://stringr.tidyverse.org/articles/from-base.html">stringr docs</a>.)</p>
+<p>Which functions are verbs in <code>ggplot2</code>? (<code>help(package=ggplot2)</code>)</p>
+<ul>
+<li>Most of them are nouns, not verbs.</li>
+<li>The layering system with <code>+</code> works well with nouns.</li>
+<li>Making them verbs would make them more verbose unnecessarily.</li>
+<li>Nouns work well in this case.</li>
+</ul>
+<p>Another exception to the verb rule: when computing something, using the noun of the thing you’re computing (e.g. <code>length</code>, <code>mean</code>) is pretty natural.</p>
+</div>
+<div id="prefixes-suffixes" class="section level4">
+<h4>Prefixes &amp; Suffixes</h4>
+<ul>
+<li>Use prefixes to group together related functions. Helps you use autocomplete to jog your memory.</li>
+<li>Use suffices for variations on a theme.</li>
+</ul>
+<div id="when-to-use-a-suffix-vs.-an-argument" class="section level5">
+<h5>When to use a suffix vs. an argument?</h5>
+<p>e.g. it’s <code>str_replace_all()</code>, not <code>str_replace(all=TRUE)</code>.</p>
+<pre class="r"><code>x &lt;- c(&#39;aba&#39;, &#39;aa&#39;, &#39;b&#39;)
+stringr::str_locate(x, &#39;a&#39;)</code></pre>
+<pre><code>##      start end
+## [1,]     1   1
+## [2,]     1   1
+## [3,]    NA  NA</code></pre>
+<pre class="r"><code>x &lt;- c(&#39;aba&#39;, &#39;aa&#39;, &#39;b&#39;)
+stringr::str_locate_all(x, &#39;a&#39;)</code></pre>
+<pre><code>## [[1]]
+##      start end
+## [1,]     1   1
+## [2,]     3   3
+## 
+## [[2]]
+##      start end
+## [1,]     1   1
+## [2,]     2   2
+## 
+## [[3]]
+##      start end</code></pre>
+<p><strong>An argument should not change the type of the output.</strong> It makes sense to have those as separate functions since they return different types.</p>
+<p>However, the <code>str_to_</code>[<code>lower</code>/<code>upper</code>/<code>title</code>] functions could’ve been one function like <code>str_capitalize(to=&#39;lower&#39;)</code>.</p>
+<p><strong>Avoid UK vs US spelling differences</strong>:</p>
+<p><code>ggplot2::scale_color_grey()</code> uses American spelling of colo[u]r but the English spelling of gr[ae]y. Also <code>summarize</code> vs <code>summarise</code> is kind of annoying too.</p>
+</div>
+</div>
+<div id="organizing-function-name-components" class="section level4">
+<h4>Organizing function name components</h4>
+<p>Using dots <code>.</code> in function names is a bad idea.</p>
+<pre class="r"><code>x &lt;- structure(1:10, class=&#39;test&#39;)
+t(x)</code></pre>
+<pre><code>## 
+##  One Sample t-test
+## 
+## data:  x
+## t = 5.7446, df = 9, p-value = 0.0002782
+## alternative hypothesis: true mean is not equal to 0
+## 95 percent confidence interval:
+##  3.334149 7.665851
+## sample estimates:
+## mean of x 
+##       5.5</code></pre>
+<p>It called <code>t.test</code>!</p>
+<p>You should only ever use dots in the context of writing S3 methods.</p>
+<p>Otherwise, just <strong>be consistent</strong>. Pick one style and stick with it! Hadley likes snake_case, but camelCase is fine.</p>
+<p>“Any style is as good as any other style, except that my style is the best.”</p>
+<p>Follow a style guide to <strong>be consistent</strong>, e.g. <a href="https://style.tidyverse.org/">tidyverse style guide</a>.</p>
+<p>Hadley’s greatest victory: Google’s R Style Guide is just the tidyverse style guide with some changes!</p>
+</div>
 </div>
 </div>
 

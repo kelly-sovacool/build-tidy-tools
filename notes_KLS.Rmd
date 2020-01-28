@@ -756,6 +756,17 @@ Be careful about when you do this.
 Unless you really enjoy suffering. 
 Hadley once spent six months debugging issues caused by this!
 
+#### use_package_doc
+
+`@importFrom` makes them available to everything in your package, not just that function.
+A better practice is to make a place to put all of your `@importFrom` tags or other global roxygen commands.
+Use `usethis::use_package_doc()`.
+
+### NAMESPACE vs. DESCRIPTION
+
+- `NAMESPACE`: about functions; managed completely by `roxygen2` (don't edit manually).
+- `DESCRIPTION`: about the package; managed by `usethis` and _you_ (manually).
+
 ## Tidyverse in packages
 
 - related article: [using ggplot2 in packages](https://ggplot2.tidyverse.org/dev/articles/ggplot2-in-packages.html)
@@ -809,3 +820,132 @@ But data masking makes it harder to program with the tidyverse.
 
 - Preface data-variables inside your function with the `.data` pronoun from the `rlang` package, then refer to them like `.data$var`.
 - Use the tidy eval operator `{{ var }}` ('embracing') to pass column names as variables to functions, OR pass it as a string and use `.data[[var]]`. Prefer the embracing solution, it's prettier!
+- You can use the dots (`...`) arg to pass multiple vars, e.g.:
+```{r}
+group_summary <- function(df, x, ...) {
+    df %>%
+        group_by(...) %>%
+        summarise(
+            n = n(),
+            min = min({{ x }}, na.rm = TRUE),
+            max = max({{ x }}, na.rm = TRUE)
+        )
+}
+```
+
+(Question: how would you document the `...` arg in the roxygen comment?)
+
+See [this article](https://ggplot2.tidyverse.org/dev/articles/ggplot2-in-packages.html#using-aes-and-vars-in-a-package-function) for more examples.
+
+Hadley: the two curly braces are magic, they don't live anywhere. They are interpreted by tidyverse packages that use data masking (started about 6 months ago). Helps so programmers don't have to learn the theory underlying it (`enquo()` and `!!`); makes tidy eval more accessible.
+
+## Interface
+
+- interface: outside of function
+- implementation: inside of function
+
+- The Tidyverse tries to have consistent interfaces across their function designs.
+- Book in progress: [Tidyverse design guide](https://design.tidyverse.org/)
+  - Probably at least 3 years away from completion.
+  - When they discover a recurring pattern, they document it.
+  
+What are the properties of a function that define its interface (there are >= 9)?
+
+- Name of the function
+- Params / arguments / inputs
+  - names & order
+  - number of args
+  - types 
+  - default values / required vs optional
+  - evaluation (regular, NSE, tidy eval)
+- Output: what it returns
+- Conditions
+  - Errors
+  - Warnings
+  - Messages
+- Side effects, e.g.
+  - print
+  - make a plot
+  - disk I/O
+  - change the random seed
+- Environment that it's in?
+
+### Case study: regular expressions / string manipulation
+
+`stringr` vs. base R
+
+Lots of inconsistencies in the interfaces for base R functions related to regex & string manipulation.
+
+### Names
+
+#### Functions should be verbs (usually)
+
+| `base R` | `stringr` | Notes |
+|------|---------|-------------|
+| `grepl()` | `str_detect()` | returns logical vector |
+| `grep()` | `str_which()` | returns location (integer vector) |
+| `grep(value = TRUE)` | `str_subset()` | returns value (character vector) |
+| `sub()` | `str_replace()` | |
+| `gsub()` | `str_replace_all()` | |
+| `strsplit()` | `str_split()` | |
+| `regexpr()`  | `str_locate()` | returns location of pattern within string|
+
+(More details in the [stringr docs](https://stringr.tidyverse.org/articles/from-base.html).)
+
+Which functions are verbs in `ggplot2`? (`help(package=ggplot2)`)
+
+- Most of them are nouns, not verbs.
+- The layering system with `+` works well with nouns.
+- Making them verbs would make them more verbose unnecessarily.
+- Nouns work well in this case.
+
+Another exception to the verb rule: when computing something, using the noun of the thing you're computing (e.g. `length`, `mean`) is pretty natural.
+
+#### Prefixes & Suffixes
+
+- Use prefixes to group together related functions. Helps you use autocomplete to jog your memory.
+- Use suffices for variations on a theme.
+
+##### When to use a suffix vs. an argument? 
+
+e.g. it's `str_replace_all()`, not `str_replace(all=TRUE)`.
+
+```{r, eval=TRUE}
+x <- c('aba', 'aa', 'b')
+stringr::str_locate(x, 'a')
+```
+
+```{r, eval=TRUE}
+x <- c('aba', 'aa', 'b')
+stringr::str_locate_all(x, 'a')
+```
+
+**An argument should not change the type of the output.**
+It makes sense to have those as separate functions since they return different types.
+
+However, the `str_to_`[`lower`/`upper`/`title`] functions could've been one function like `str_capitalize(to='lower')`.
+
+**Avoid UK vs US spelling differences**:
+
+`ggplot2::scale_color_grey()` uses American spelling of colo[u]r but the English spelling of gr[ae]y. Also `summarize` vs `summarise` is kind of annoying too.
+
+#### Organizing function name components
+
+Using dots `.` in function names is a bad idea.
+```{r, eval=TRUE}
+x <- structure(1:10, class='test')
+t(x)
+```
+
+It called `t.test`! 
+
+You should only ever use dots in the context of writing S3 methods.
+
+Otherwise, just **be consistent**. Pick one style and stick with it!
+Hadley likes snake_case, but camelCase is fine. 
+
+"Any style is as good as any other style, except that my style is the best."
+
+Follow a style guide to **be consistent**, e.g. [tidyverse style guide](https://style.tidyverse.org/).
+
+Hadley's greatest victory: Google's R Style Guide is just the tidyverse style guide with some changes! 
