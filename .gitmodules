@@ -7,3 +7,6 @@
 [submodule "fordogs"]
 	path = fordogs
 	url = https://github.com/kelly-sovacool/fordogs
+[submodule "tidytest"]
+	path = tidytest
+	url = /Users/kelly/Desktop/tidytest
