@@ -755,3 +755,57 @@ Be careful about when you do this.
 
 Unless you really enjoy suffering. 
 Hadley once spent six months debugging issues caused by this!
+
+## Tidyverse in packages
+
+- related article: [using ggplot2 in packages](https://ggplot2.tidyverse.org/dev/articles/ggplot2-in-packages.html)
+
+### Warm-up
+
+Turn this chunk of code into a package:
+```{r}
+library(ggplot2)
+library(dplyr)
+# cyl_plot()
+ggplot(mtcars) + 
+  geom_bar(aes(cyl)) + 
+  coord_flip()
+# cyl_sum()
+mtcars %>% 
+  group_by(cyl) %>% 
+  summarise(n = n(), mpg = mean(mpg))
+```
+
+Question from the audience: what if you have a dependency listed in `DESCRIPTION` that you don't actually need? Is there a way to programmatically check for unneeded imports?
+(Hadley probably knows. Maybe the `itdepends` package?)
+
+### Data Masking
+
+- **environment-variables** (programming); datasets - variables available in the (ggplot2) environment
+  - `mtcars`
+  - `starwars`
+- **data-variables** (statistical); columns - variables available in the datasets
+  - `cyl`
+  - `mpg`
+  - `homeworld`
+  - `species`
+  
+The tidyverse blurs the distinction between whether something is an environment vs data variable. You only need to start thinking about this distincition when you start programming with the tidyverse.
+
+Why use data masking? It makes your life easier as a data analyst.
+  
+```{r}
+# tidyverse
+starwars %>% filter(homeworld == "Naboo", species == "Human")
+
+# base
+starwars[starwars$homeworld == "Naboo" & starwars$species == "Human"]
+```
+(The base R version looks similar to Python pandas to me. I'm not a fan of how cumbersome that syntax is.)
+
+But data masking makes it harder to program with the tidyverse.
+
+### Solutions
+
+- Preface data-variables inside your function with the `.data` pronoun from the `rlang` package, then refer to them like `.data$var`.
+- Use the tidy eval operator `{{ var }}` ('embracing') to pass column names as variables to functions, OR pass it as a string and use `.data[[var]]`. Prefer the embracing solution, it's prettier!

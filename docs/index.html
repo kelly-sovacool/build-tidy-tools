@@ -1917,20 +1917,25 @@ my_sd(x)</code></pre>
 <li>if you got rid of environments (+ a few other smaller things), you’d basically end up with Python. (Which isn’t bad, just not R.)</li>
 </ul></li>
 </ul>
-<pre class="r"><code>library(rlang)
-## env
+<pre class="r"><code>library(rlang)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;rlang&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:testthat&#39;:
+## 
+##     is_false, is_null, is_true</code></pre>
+<pre class="r"><code>## env
 e &lt;- env()
 e$a &lt;- 1
 e$a</code></pre>
 <pre><code>## [1] 1</code></pre>
 <pre class="r"><code>#e[[1]] # doesn&#39;t work; unordered
 lobstr::obj_addr(e)</code></pre>
-<pre><code>## [1] &quot;0x7fd65b01fbd0&quot;</code></pre>
+<pre><code>## [1] &quot;0x7fcc59c2cdc0&quot;</code></pre>
 <pre class="r"><code>e$e &lt;- e  
 e$e</code></pre>
-<pre><code>## &lt;environment: 0x7fd65b01fbd0&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc59c2cdc0&gt;</code></pre>
 <pre class="r"><code>lobstr::obj_addr(e)  # e didn&#39;t get overwritten</code></pre>
-<pre><code>## [1] &quot;0x7fd65b01fbd0&quot;</code></pre>
+<pre><code>## [1] &quot;0x7fcc59c2cdc0&quot;</code></pre>
 <pre class="r"><code>## list
 l = list(a=1)
 l$l &lt;- l  # original list got overwritten
@@ -1942,9 +1947,9 @@ l</code></pre>
 ## $l$a
 ## [1] 1</code></pre>
 <pre class="r"><code>e</code></pre>
-<pre><code>## &lt;environment: 0x7fd65b01fbd0&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc59c2cdc0&gt;</code></pre>
 <pre class="r"><code>str(e)</code></pre>
-<pre><code>## &lt;environment: 0x7fd65b01fbd0&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc59c2cdc0&gt;</code></pre>
 <pre class="r"><code>ls(e)</code></pre>
 <pre><code>## [1] &quot;a&quot; &quot;e&quot;</code></pre>
 <pre class="r"><code>names(e)</code></pre>
@@ -1954,9 +1959,9 @@ l</code></pre>
 <pre class="r"><code>str(as.list(e))</code></pre>
 <pre><code>## List of 2
 ##  $ a: num 1
-##  $ e:&lt;environment: 0x7fd65b01fbd0&gt;</code></pre>
+##  $ e:&lt;environment: 0x7fcc59c2cdc0&gt;</code></pre>
 <pre class="r"><code>env_print(e)</code></pre>
-<pre><code>## &lt;environment: 0x7fd65b01fbd0&gt;
+<pre><code>## &lt;environment: 0x7fcc59c2cdc0&gt;
 ## parent: &lt;environment: global&gt;
 ## bindings:
 ##  * a: &lt;dbl&gt;
@@ -2001,7 +2006,7 @@ find_var(&quot;b&quot;, e1)
   }
 }
 find_env(&quot;a&quot;, e)</code></pre>
-<pre><code>## &lt;environment: 0x7fd65b01fbd0&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc59c2cdc0&gt;</code></pre>
 <pre class="r"><code># Returns e1
 find_env(&quot;find_env&quot;, e)</code></pre>
 <pre><code>## &lt;environment: R_GlobalEnv&gt;</code></pre>
@@ -2015,17 +2020,17 @@ find_env(&quot;sd&quot;, e)</code></pre>
 <pre class="r"><code># Returns stats pkg env</code></pre>
 <p>The sequence of envs R looks in:</p>
 <pre class="r"><code>search()</code></pre>
-<pre><code>##  [1] &quot;.GlobalEnv&quot;        &quot;package:rlang&quot;     &quot;tools:rstudio&quot;     &quot;package:stats&quot;    
-##  [5] &quot;package:graphics&quot;  &quot;package:grDevices&quot; &quot;package:utils&quot;     &quot;package:datasets&quot; 
-##  [9] &quot;package:testthat&quot;  &quot;package:devtools&quot;  &quot;package:usethis&quot;   &quot;package:methods&quot;  
-## [13] &quot;Autoloads&quot;         &quot;package:base&quot;</code></pre>
+<pre><code>##  [1] &quot;.GlobalEnv&quot;        &quot;package:rlang&quot;     &quot;package:dplyr&quot;     &quot;package:ggplot2&quot;  
+##  [5] &quot;tools:rstudio&quot;     &quot;package:stats&quot;     &quot;package:graphics&quot;  &quot;package:grDevices&quot;
+##  [9] &quot;package:utils&quot;     &quot;package:datasets&quot;  &quot;package:testthat&quot;  &quot;package:devtools&quot; 
+## [13] &quot;package:usethis&quot;   &quot;package:methods&quot;   &quot;Autoloads&quot;         &quot;package:base&quot;</code></pre>
 <p>Does it take less time to find something in packages higher up in the search path? Yes. As you load more packages, it takes it a little bit longer to find packages. But it’s such a tiny differences it doesn’t affect your code that much.</p>
 <p>Back to the <code>sd</code> example:</p>
 <pre class="r"><code>sd</code></pre>
 <pre><code>## function (x, na.rm = FALSE) 
 ## sqrt(var(if (is.vector(x) || is.factor(x)) x else as.double(x), 
 ##     na.rm = na.rm))
-## &lt;bytecode: 0x7fd653244640&gt;
+## &lt;bytecode: 0x7fcc56c62e00&gt;
 ## &lt;environment: namespace:stats&gt;</code></pre>
 <pre class="r"><code>find_env(&quot;var&quot;, environment(sd))</code></pre>
 <pre><code>## &lt;environment: namespace:stats&gt;</code></pre>
@@ -2056,28 +2061,28 @@ get_env(MASS::select)</code></pre>
 ##  * indent: &lt;lazy&gt; [L]
 ##  * fortify.cld: &lt;lazy&gt; [L]
 ##  * predictdf.glm: &lt;lazy&gt; [L]
-##  * standardise_aes_names: &lt;fn&gt; [L]
-##  * find_panel: &lt;fn&gt; [L]
-##  * facet_wrap: &lt;fn&gt; [L]
-##  * geom_label: &lt;fn&gt; [L]
-##  * StatSmooth: &lt;S3: StatSmooth&gt; [L]
-##  * aes_q: &lt;fn&gt; [L]
+##  * standardise_aes_names: &lt;lazy&gt; [L]
+##  * find_panel: &lt;lazy&gt; [L]
+##  * facet_wrap: &lt;lazy&gt; [L]
+##  * geom_label: &lt;lazy&gt; [L]
+##  * StatSmooth: &lt;lazy&gt; [L]
+##  * aes_q: &lt;lazy&gt; [L]
 ##  * label_variable: &lt;lazy&gt; [L]
-##  * labeller: &lt;fn&gt; [L]
+##  * labeller: &lt;lazy&gt; [L]
 ##  * calc_logticks: &lt;lazy&gt; [L]
 ##  * ggplot_add: &lt;fn&gt; [L]
 ##  * element_grob.element_text: &lt;lazy&gt; [L]
-##  * StatSummary2d: &lt;S3: StatSummary2d&gt; [L]
-##  * GeomMap: &lt;S3: GeomMap&gt; [L]
+##  * StatSummary2d: &lt;lazy&gt; [L]
+##  * GeomMap: &lt;lazy&gt; [L]
 ##  * `$.ggproto_parent`: &lt;lazy&gt; [L]
-##  * scale_color_manual: &lt;fn&gt; [L]
+##  * scale_color_manual: &lt;lazy&gt; [L]
 ##  * parse_safe: &lt;lazy&gt; [L]
 ##    * ... with 834 more bindings</code></pre>
 <pre class="r"><code>env_print(get_env(dplyr::mutate))</code></pre>
 <pre><code>## &lt;environment: namespace:dplyr&gt; [L]
 ## parent: &lt;environment: imports:dplyr&gt;
 ## bindings:
-##  * db_desc: &lt;fn&gt; [L]
+##  * db_desc: &lt;lazy&gt; [L]
 ##  * check_suffix: &lt;lazy&gt; [L]
 ##  * warn_deprecated: &lt;lazy&gt; [L]
 ##  * select.tbl_cube: &lt;lazy&gt; [L]
@@ -2087,10 +2092,10 @@ get_env(MASS::select)</code></pre>
 ##  * `_dplyr_inner_join_impl`: &lt;S3: CallRoutine&gt; [L]
 ##  * mutate_.data.frame: &lt;lazy&gt; [L]
 ##  * env_bind_do_pronouns: &lt;lazy&gt; [L]
-##  * funs_: &lt;fn&gt; [L]
-##  * distinct_if: &lt;fn&gt; [L]
+##  * funs_: &lt;lazy&gt; [L]
+##  * distinct_if: &lt;lazy&gt; [L]
 ##  * map2_int: &lt;lazy&gt; [L]
-##  * ident: &lt;fn&gt; [L]
+##  * ident: &lt;lazy&gt; [L]
 ##  * wrap: &lt;lazy&gt; [L]
 ##  * group_by.tbl_cube: &lt;lazy&gt; [L]
 ##  * group_nest: &lt;fn&gt; [L]
@@ -2112,28 +2117,28 @@ get_env(MASS::select)</code></pre>
 ##  * corresp.formula: &lt;lazy&gt; [L]
 ##  * .__S3MethodsTable__.: &lt;env&gt; [L]
 ##  * VR_phi4_bin: &lt;S3: CRoutine&gt; [L]
-##  * rational: &lt;fn&gt; [L]
+##  * rational: &lt;lazy&gt; [L]
 ##  * family.negbin: &lt;lazy&gt; [L]
 ##  * .Diag: &lt;lazy&gt; [L]
-##  * ucv: &lt;fn&gt; [L]
+##  * ucv: &lt;lazy&gt; [L]
 ##  * print.abbrev: &lt;lazy&gt; [L]
 ##  * renumerate: &lt;fn&gt; [L]
-##  * negative.binomial: &lt;fn&gt; [L]
+##  * negative.binomial: &lt;lazy&gt; [L]
 ##  * lda.formula: &lt;lazy&gt; [L]
-##  * dose.p: &lt;fn&gt; [L]
+##  * dose.p: &lt;lazy&gt; [L]
 ##  * fitted.loglm: &lt;lazy&gt; [L]
 ##    * ... with 212 more bindings</code></pre>
 <p><code>env_print</code> shows all the packages functions, including ones that aren’t exported (can use triple colons <code>:::</code> to access them).</p>
 <pre class="r"><code>env_parent(get_env(ggplot2::geom_point))</code></pre>
-<pre><code>## &lt;environment: 0x7fd65d33e940&gt;
+<pre><code>## &lt;environment: 0x7fcc572f3880&gt;
 ## attr(,&quot;name&quot;)
 ## [1] &quot;imports:ggplot2&quot;</code></pre>
 <pre class="r"><code>env_parent(get_env(dplyr::mutate))</code></pre>
-<pre><code>## &lt;environment: 0x7fd65fd0b2b0&gt;
+<pre><code>## &lt;environment: 0x7fcc56c1a6e0&gt;
 ## attr(,&quot;name&quot;)
 ## [1] &quot;imports:dplyr&quot;</code></pre>
 <pre class="r"><code>env_parent(get_env(MASS::select))</code></pre>
-<pre><code>## &lt;environment: 0x7fd640810ee8&gt;
+<pre><code>## &lt;environment: 0x7fcc58465b38&gt;
 ## attr(,&quot;name&quot;)
 ## [1] &quot;imports:MASS&quot;</code></pre>
 <p>``<code>env_parent</code>: just get the immediate parent.</p>
@@ -2162,9 +2167,9 @@ get_env(MASS::select)</code></pre>
 </ul></li>
 </ul>
 <pre class="r"><code>lobstr::obj_addr(env_parent(get_env(ggplot2::geom_point))$grid.set)</code></pre>
-<pre><code>## [1] &quot;0x7fd6569b0b60&quot;</code></pre>
+<pre><code>## [1] &quot;0x7fcc5a4f5380&quot;</code></pre>
 <pre class="r"><code>lobstr::obj_addr(grid::grid.set)</code></pre>
-<pre><code>## [1] &quot;0x7fd6569b0b60&quot;</code></pre>
+<pre><code>## [1] &quot;0x7fcc5a4f5380&quot;</code></pre>
 <p>When using functions from other packages, INCLUDING DEFAULT PACKAGES (but not <code>base</code>), need to call it explicitly or use the <code>importFrom</code> tag in the <code>Roxygen</code> comment.</p>
 <p>Option A:</p>
 <pre class="r"><code>my_sd &lt;- function(x) sqrt(stats::var(x))</code></pre>
@@ -2224,6 +2229,60 @@ use_package(&quot;dplyr&quot;)</code></pre>
 <pre class="r"><code>`%&lt;%` &lt;- magrittr::`%&lt;%`</code></pre>
 <p>Unless you really enjoy suffering. Hadley once spent six months debugging issues caused by this!</p>
 </div>
+</div>
+</div>
+<div id="tidyverse-in-packages" class="section level2">
+<h2>Tidyverse in packages</h2>
+<ul>
+<li>related article: <a href="https://ggplot2.tidyverse.org/dev/articles/ggplot2-in-packages.html">using ggplot2 in packages</a></li>
+</ul>
+<div id="warm-up" class="section level3">
+<h3>Warm-up</h3>
+<p>Turn this chunk of code into a package:</p>
+<pre class="r"><code>library(ggplot2)
+library(dplyr)
+# cyl_plot()
+ggplot(mtcars) + 
+  geom_bar(aes(cyl)) + 
+  coord_flip()
+# cyl_sum()
+mtcars %&gt;% 
+  group_by(cyl) %&gt;% 
+  summarise(n = n(), mpg = mean(mpg))</code></pre>
+<p>Question from the audience: what if you have a dependency listed in <code>DESCRIPTION</code> that you don’t actually need? Is there a way to programmatically check for unneeded imports? (Hadley probably knows. Maybe the <code>itdepends</code> package?)</p>
+</div>
+<div id="data-masking" class="section level3">
+<h3>Data Masking</h3>
+<ul>
+<li><strong>environment-variables</strong> (programming); datasets - variables available in the (ggplot2) environment
+<ul>
+<li><code>mtcars</code></li>
+<li><code>starwars</code></li>
+</ul></li>
+<li><strong>data-variables</strong> (statistical); columns - variables available in the datasets
+<ul>
+<li><code>cyl</code></li>
+<li><code>mpg</code></li>
+<li><code>homeworld</code></li>
+<li><code>species</code></li>
+</ul></li>
+</ul>
+<p>The tidyverse blurs the distinction between whether something is an environment vs data variable. You only need to start thinking about this distincition when you start programming with the tidyverse.</p>
+<p>Why use data masking? It makes your life easier as a data analyst.</p>
+<pre class="r"><code># tidyverse
+starwars %&gt;% filter(homeworld == &quot;Naboo&quot;, species == &quot;Human&quot;)
+
+# base
+starwars[starwars$homeworld == &quot;Naboo&quot; &amp; starwars$species == &quot;Human&quot;]</code></pre>
+<p>(The base R version looks similar to Python pandas to me. I’m not a fan of how cumbersome that syntax is.)</p>
+<p>But data masking makes it harder to program with the tidyverse.</p>
+</div>
+<div id="solutions" class="section level3">
+<h3>Solutions</h3>
+<ul>
+<li>Preface data-variables inside your function with the <code>.data</code> pronoun from the <code>rlang</code> package, then refer to them like <code>.data$var</code>.</li>
+<li>Use the tidy eval operator <code>{{ var }}</code> (‘embracing’) to pass column names as variables to functions, OR pass it as a string and use <code>.data[[var]]</code>. Prefer the embracing solution, it’s prettier!</li>
+</ul>
 </div>
 </div>
 
