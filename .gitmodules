@@ -4,3 +4,6 @@
 [submodule "fordogs"]
 	path = fordogs
 	url = git://github.com/kelly-sovacool/fordogs.git
+[submodule "ns"]
+	path = ns
+	url = /Users/kelly/Desktop/ns
