@@ -794,7 +794,7 @@ mtcars %>%
 Question from the audience: what if you have a dependency listed in `DESCRIPTION` that you don't actually need? Is there a way to programmatically check for unneeded imports?
 (Hadley probably knows. Maybe the `itdepends` package?)
 
-### Data Masking
+### Tidy Eval / Data Masking
 
 - **environment-variables** (programming); datasets - variables available in the (ggplot2) environment
   - `mtcars`
@@ -820,7 +820,7 @@ starwars[starwars$homeworld == "Naboo" & starwars$species == "Human"]
 
 But data masking makes it harder to program with the tidyverse.
 
-### Solutions
+### How to use tidy eval in your packages
 
 - Preface data-variables inside your function with the `.data` pronoun from the `rlang` package, then refer to them like `.data$var`.
 - Use the tidy eval operator `{{ var }}` ('embracing') to pass column names as variables to functions, OR pass it as a string and use `.data[[var]]`. Prefer the embracing solution, it's prettier!
@@ -842,6 +842,13 @@ group_summary <- function(df, x, ...) {
 See [this article](https://ggplot2.tidyverse.org/dev/articles/ggplot2-in-packages.html#using-aes-and-vars-in-a-package-function) for more examples.
 
 Hadley: the two curly braces are magic, they don't live anywhere. They are interpreted by tidyverse packages that use data masking (started about 6 months ago). Helps so programmers don't have to learn the theory underlying it (`enquo()` and `!!`); makes tidy eval more accessible.
+
+### How to include data in your packages
+
+- Code to prepare your raw dataset:
+`usethis::use_data_raw("data")`: `data-raw/data.R`
+- Also need to document the dataset:
+`usethis::use_r("data")`: `R/data.R`
 
 ## Interface
 

@@ -1927,12 +1927,12 @@ e$a</code></pre>
 <pre><code>## [1] 1</code></pre>
 <pre class="r"><code>#e[[1]] # doesn&#39;t work; unordered
 lobstr::obj_addr(e)</code></pre>
-<pre><code>## [1] &quot;0x7fcc59e02f90&quot;</code></pre>
+<pre><code>## [1] &quot;0x7fcc5f78fd80&quot;</code></pre>
 <pre class="r"><code>e$e &lt;- e  
 e$e</code></pre>
-<pre><code>## &lt;environment: 0x7fcc59e02f90&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc5f78fd80&gt;</code></pre>
 <pre class="r"><code>lobstr::obj_addr(e)  # e didn&#39;t get overwritten</code></pre>
-<pre><code>## [1] &quot;0x7fcc59e02f90&quot;</code></pre>
+<pre><code>## [1] &quot;0x7fcc5f78fd80&quot;</code></pre>
 <pre class="r"><code>## list
 l = list(a=1)
 l$l &lt;- l  # original list got overwritten
@@ -1944,9 +1944,9 @@ l</code></pre>
 ## $l$a
 ## [1] 1</code></pre>
 <pre class="r"><code>e</code></pre>
-<pre><code>## &lt;environment: 0x7fcc59e02f90&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc5f78fd80&gt;</code></pre>
 <pre class="r"><code>str(e)</code></pre>
-<pre><code>## &lt;environment: 0x7fcc59e02f90&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc5f78fd80&gt;</code></pre>
 <pre class="r"><code>ls(e)</code></pre>
 <pre><code>## [1] &quot;a&quot; &quot;e&quot;</code></pre>
 <pre class="r"><code>names(e)</code></pre>
@@ -1956,9 +1956,9 @@ l</code></pre>
 <pre class="r"><code>str(as.list(e))</code></pre>
 <pre><code>## List of 2
 ##  $ a: num 1
-##  $ e:&lt;environment: 0x7fcc59e02f90&gt;</code></pre>
+##  $ e:&lt;environment: 0x7fcc5f78fd80&gt;</code></pre>
 <pre class="r"><code>env_print(e)</code></pre>
-<pre><code>## &lt;environment: 0x7fcc59e02f90&gt;
+<pre><code>## &lt;environment: 0x7fcc5f78fd80&gt;
 ## parent: &lt;environment: global&gt;
 ## bindings:
 ##  * a: &lt;dbl&gt;
@@ -2003,7 +2003,7 @@ find_var(&quot;b&quot;, e1)
   }
 }
 find_env(&quot;a&quot;, e)</code></pre>
-<pre><code>## &lt;environment: 0x7fcc59e02f90&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc5f78fd80&gt;</code></pre>
 <pre class="r"><code># Returns e1
 find_env(&quot;find_env&quot;, e)</code></pre>
 <pre><code>## &lt;environment: R_GlobalEnv&gt;</code></pre>
@@ -2261,8 +2261,8 @@ mtcars %&gt;%
   summarise(n = n(), mpg = mean(mpg))</code></pre>
 <p>Question from the audience: what if you have a dependency listed in <code>DESCRIPTION</code> that you don’t actually need? Is there a way to programmatically check for unneeded imports? (Hadley probably knows. Maybe the <code>itdepends</code> package?)</p>
 </div>
-<div id="data-masking" class="section level3">
-<h3>Data Masking</h3>
+<div id="tidy-eval-data-masking" class="section level3">
+<h3>Tidy Eval / Data Masking</h3>
 <ul>
 <li><strong>environment-variables</strong> (programming); datasets - variables available in the (ggplot2) environment
 <ul>
@@ -2287,8 +2287,8 @@ starwars[starwars$homeworld == &quot;Naboo&quot; &amp; starwars$species == &quot
 <p>(The base R version looks similar to Python pandas to me. I’m not a fan of how cumbersome that syntax is.)</p>
 <p>But data masking makes it harder to program with the tidyverse.</p>
 </div>
-<div id="solutions" class="section level3">
-<h3>Solutions</h3>
+<div id="how-to-use-tidy-eval-in-your-packages" class="section level3">
+<h3>How to use tidy eval in your packages</h3>
 <ul>
 <li>Preface data-variables inside your function with the <code>.data</code> pronoun from the <code>rlang</code> package, then refer to them like <code>.data$var</code>.</li>
 <li>Use the tidy eval operator <code>{{ var }}</code> (‘embracing’) to pass column names as variables to functions, OR pass it as a string and use <code>.data[[var]]</code>. Prefer the embracing solution, it’s prettier!</li>
@@ -2306,6 +2306,13 @@ starwars[starwars$homeworld == &quot;Naboo&quot; &amp; starwars$species == &quot
 <p>(Question: how would you document the <code>...</code> arg in the roxygen comment?)</p>
 <p>See <a href="https://ggplot2.tidyverse.org/dev/articles/ggplot2-in-packages.html#using-aes-and-vars-in-a-package-function">this article</a> for more examples.</p>
 <p>Hadley: the two curly braces are magic, they don’t live anywhere. They are interpreted by tidyverse packages that use data masking (started about 6 months ago). Helps so programmers don’t have to learn the theory underlying it (<code>enquo()</code> and <code>!!</code>); makes tidy eval more accessible.</p>
+</div>
+<div id="how-to-include-data-in-your-packages" class="section level3">
+<h3>How to include data in your packages</h3>
+<ul>
+<li>Code to prepare your raw dataset: <code>usethis::use_data_raw(&quot;data&quot;)</code>: <code>data-raw/data.R</code></li>
+<li>Also need to document the dataset: <code>usethis::use_r(&quot;data&quot;)</code>: <code>R/data.R</code></li>
+</ul>
 </div>
 </div>
 <div id="interface" class="section level2">
@@ -2865,9 +2872,6 @@ bizarro.data.frame &lt;- function(x) {
 ##  [1] -4 -4 -1 -1 -2 -1 -4 -2 -2 -4 -4 -3 -3 -3 -4 -4 -4 -1 -2 -1 -1 -2 -2
 ## [24] -4 -2 -1 -2 -2 -4 -6 -8 -2</code></pre>
 </div>
-</div>
-<div id="using-data-in-packages" class="section level2">
-<h2>Using data in packages</h2>
 </div>
 
 
