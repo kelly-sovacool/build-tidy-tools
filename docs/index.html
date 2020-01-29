@@ -1529,20 +1529,20 @@ div.tocify {
 <pre class="r"><code>data.frame(env=search(), path=searchpaths())</code></pre>
 <pre class="r"><code>library(dplyr)
 data.frame(env=search(), path=searchpaths())</code></pre>
-</div>
-<div id="r-setup-stuff-to-make-your-life-easier" class="section level2">
-<h2>R setup stuff to make your life easier</h2>
-<div id="open-.rprofile" class="section level3">
-<h3>Open .Rprofile</h3>
+<div id="r-setup" class="section level3">
+<h3>R setup</h3>
+<p>Stuff to make your life easier</p>
+<div id="open-.rprofile" class="section level4">
+<h4>Open .Rprofile</h4>
 <pre class="r"><code>usethis::edit_r_profile()</code></pre>
 </div>
-<div id="require-devtools-in-your-.rprofile" class="section level3">
-<h3>Require devtools in your .Rprofile</h3>
+<div id="require-devtools-in-your-.rprofile" class="section level4">
+<h4>Require devtools in your .Rprofile</h4>
 <pre class="r"><code>usethis::use_devtools()
 usethis::use_partial_warnings()</code></pre>
 </div>
-<div id="tell-usethis-about-yourself" class="section level3">
-<h3>Tell usethis about yourself</h3>
+<div id="tell-usethis-about-yourself" class="section level4">
+<h4>Tell usethis about yourself</h4>
 <p>In your .Rprofile:</p>
 <pre class="r"><code>options(
   usethis.full_name = &quot;Jane Doe&quot;,
@@ -1555,13 +1555,13 @@ usethis::use_partial_warnings()</code></pre>
 )</code></pre>
 <p>See <a href="https://usethis.r-lib.org/articles/articles/usethis-setup.html"><code>usethis</code> setup docs</a></p>
 </div>
-<div id="restart-r-completely-fresh-with-an-empty-environment-often" class="section level3">
-<h3>Restart R completely fresh with an empty environment OFTEN</h3>
+<div id="restart-r-completely-fresh-with-an-empty-environment-often" class="section level4">
+<h4>Restart R completely fresh with an empty environment OFTEN</h4>
 <p>Options in global settings: - Don’t Restore <code>.RData</code> at startup - Don’t save your workspace on exit</p>
 <p>Better for reproducibility. <a href="https://twitter.com/hadleywickham/status/940021008764846080">Also prevents fires!</a></p>
 </div>
-<div id="my-.rprofile-now-looks-like-this" class="section level3">
-<h3>My .Rprofile now looks like this:</h3>
+<div id="my-.rprofile-now-looks-like-this" class="section level4">
+<h4>My .Rprofile now looks like this:</h4>
 <pre class="r"><code>if (interactive()) {
     suppressMessages(require(devtools))
     suppressMessages(require(testthat))
@@ -1581,25 +1581,27 @@ options(
     )
 )</code></pre>
 </div>
-<div id="sitrep-functions" class="section level3">
-<h3>sitrep functions</h3>
-<div id="project-sitrep" class="section level4">
-<h4>project sitrep</h4>
+<div id="sitrep-functions" class="section level4">
+<h4>sitrep functions</h4>
+<div id="project-sitrep" class="section level5">
+<h5>project sitrep</h5>
 <pre class="r"><code>usethis::proj_sitrep()</code></pre>
 </div>
-<div id="add-.rdata-.ds_store-to-.gitignore" class="section level4">
-<h4>Add <code>.RData</code> &amp; <code>.DS_Store</code> to <code>.gitignore</code></h4>
+<div id="add-.rdata-.ds_store-to-.gitignore" class="section level5">
+<h5>Add <code>.RData</code> &amp; <code>.DS_Store</code> to <code>.gitignore</code></h5>
 <pre class="r"><code>usethis::git_vaccinate() </code></pre>
 </div>
-<div id="git-sitrep" class="section level4">
-<h4>git sitrep</h4>
+<div id="git-sitrep" class="section level5">
+<h5>git sitrep</h5>
 <pre class="r"><code>usethis::git_sitrep()</code></pre>
 </div>
 </div>
 </div>
-<div id="what-bulding-a-package-looks-like-from-start-to-finish" class="section level2">
-<h2>What bulding a package looks like from start to finish</h2>
-<p><a href="https://r-pkgs.org/whole-game.html">“The Whole Game”</a></p>
+</div>
+<div id="the-whole-game" class="section level2">
+<h2>The Whole Game</h2>
+<p>What bulding a package looks like from start to finish</p>
+<p>R Packages chapter: <a href="https://r-pkgs.org/whole-game.html">“The Whole Game”</a></p>
 <div id="create-a-new-empty-package" class="section level3">
 <h3>Create a new, empty package</h3>
 <pre class="r"><code>usethis::create_package(&quot;~/Desktop/foofactors&quot;)</code></pre>
@@ -1925,12 +1927,12 @@ e$a</code></pre>
 <pre><code>## [1] 1</code></pre>
 <pre class="r"><code>#e[[1]] # doesn&#39;t work; unordered
 lobstr::obj_addr(e)</code></pre>
-<pre><code>## [1] &quot;0x7fcc58425620&quot;</code></pre>
+<pre><code>## [1] &quot;0x7fcc59e02f90&quot;</code></pre>
 <pre class="r"><code>e$e &lt;- e  
 e$e</code></pre>
-<pre><code>## &lt;environment: 0x7fcc58425620&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc59e02f90&gt;</code></pre>
 <pre class="r"><code>lobstr::obj_addr(e)  # e didn&#39;t get overwritten</code></pre>
-<pre><code>## [1] &quot;0x7fcc58425620&quot;</code></pre>
+<pre><code>## [1] &quot;0x7fcc59e02f90&quot;</code></pre>
 <pre class="r"><code>## list
 l = list(a=1)
 l$l &lt;- l  # original list got overwritten
@@ -1942,9 +1944,9 @@ l</code></pre>
 ## $l$a
 ## [1] 1</code></pre>
 <pre class="r"><code>e</code></pre>
-<pre><code>## &lt;environment: 0x7fcc58425620&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc59e02f90&gt;</code></pre>
 <pre class="r"><code>str(e)</code></pre>
-<pre><code>## &lt;environment: 0x7fcc58425620&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc59e02f90&gt;</code></pre>
 <pre class="r"><code>ls(e)</code></pre>
 <pre><code>## [1] &quot;a&quot; &quot;e&quot;</code></pre>
 <pre class="r"><code>names(e)</code></pre>
@@ -1954,9 +1956,9 @@ l</code></pre>
 <pre class="r"><code>str(as.list(e))</code></pre>
 <pre><code>## List of 2
 ##  $ a: num 1
-##  $ e:&lt;environment: 0x7fcc58425620&gt;</code></pre>
+##  $ e:&lt;environment: 0x7fcc59e02f90&gt;</code></pre>
 <pre class="r"><code>env_print(e)</code></pre>
-<pre><code>## &lt;environment: 0x7fcc58425620&gt;
+<pre><code>## &lt;environment: 0x7fcc59e02f90&gt;
 ## parent: &lt;environment: global&gt;
 ## bindings:
 ##  * a: &lt;dbl&gt;
@@ -2001,7 +2003,7 @@ find_var(&quot;b&quot;, e1)
   }
 }
 find_env(&quot;a&quot;, e)</code></pre>
-<pre><code>## &lt;environment: 0x7fcc58425620&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc59e02f90&gt;</code></pre>
 <pre class="r"><code># Returns e1
 find_env(&quot;find_env&quot;, e)</code></pre>
 <pre><code>## &lt;environment: R_GlobalEnv&gt;</code></pre>
@@ -2058,28 +2060,28 @@ get_env(MASS::select)</code></pre>
 ##  * indent: &lt;lazy&gt; [L]
 ##  * fortify.cld: &lt;lazy&gt; [L]
 ##  * predictdf.glm: &lt;lazy&gt; [L]
-##  * standardise_aes_names: &lt;lazy&gt; [L]
-##  * find_panel: &lt;lazy&gt; [L]
-##  * facet_wrap: &lt;lazy&gt; [L]
-##  * geom_label: &lt;lazy&gt; [L]
-##  * StatSmooth: &lt;lazy&gt; [L]
-##  * aes_q: &lt;lazy&gt; [L]
+##  * standardise_aes_names: &lt;fn&gt; [L]
+##  * find_panel: &lt;fn&gt; [L]
+##  * facet_wrap: &lt;fn&gt; [L]
+##  * geom_label: &lt;fn&gt; [L]
+##  * StatSmooth: &lt;S3: StatSmooth&gt; [L]
+##  * aes_q: &lt;fn&gt; [L]
 ##  * label_variable: &lt;lazy&gt; [L]
-##  * labeller: &lt;lazy&gt; [L]
+##  * labeller: &lt;fn&gt; [L]
 ##  * calc_logticks: &lt;lazy&gt; [L]
 ##  * ggplot_add: &lt;fn&gt; [L]
 ##  * element_grob.element_text: &lt;lazy&gt; [L]
-##  * StatSummary2d: &lt;lazy&gt; [L]
-##  * GeomMap: &lt;lazy&gt; [L]
+##  * StatSummary2d: &lt;S3: StatSummary2d&gt; [L]
+##  * GeomMap: &lt;S3: GeomMap&gt; [L]
 ##  * `$.ggproto_parent`: &lt;lazy&gt; [L]
-##  * scale_color_manual: &lt;lazy&gt; [L]
+##  * scale_color_manual: &lt;fn&gt; [L]
 ##  * parse_safe: &lt;lazy&gt; [L]
 ##    * ... with 834 more bindings</code></pre>
 <pre class="r"><code>env_print(get_env(dplyr::mutate))</code></pre>
 <pre><code>## &lt;environment: namespace:dplyr&gt; [L]
 ## parent: &lt;environment: imports:dplyr&gt;
 ## bindings:
-##  * db_desc: &lt;lazy&gt; [L]
+##  * db_desc: &lt;fn&gt; [L]
 ##  * check_suffix: &lt;lazy&gt; [L]
 ##  * warn_deprecated: &lt;lazy&gt; [L]
 ##  * select.tbl_cube: &lt;lazy&gt; [L]
@@ -2089,8 +2091,8 @@ get_env(MASS::select)</code></pre>
 ##  * `_dplyr_inner_join_impl`: &lt;S3: CallRoutine&gt; [L]
 ##  * mutate_.data.frame: &lt;lazy&gt; [L]
 ##  * env_bind_do_pronouns: &lt;lazy&gt; [L]
-##  * funs_: &lt;lazy&gt; [L]
-##  * distinct_if: &lt;lazy&gt; [L]
+##  * funs_: &lt;fn&gt; [L]
+##  * distinct_if: &lt;fn&gt; [L]
 ##  * map2_int: &lt;lazy&gt; [L]
 ##  * ident: &lt;lazy&gt; [L]
 ##  * wrap: &lt;lazy&gt; [L]
@@ -2639,6 +2641,233 @@ count &lt;- function(df, ...) {
 df %&gt;% rename(new = old)
 df %&gt;% recode(old = new)  # recode flips new &amp; old</code></pre>
 </div>
+</div>
+<div id="object-oriented-programming" class="section level2">
+<h2>Object-oriented programming</h2>
+<ul>
+<li>Base types - <code>typeof()</code></li>
+<li>S3 - Simplest system of OOP. Longest history. Add attributes to a base object. Most important attribute <code>class</code>.</li>
+<li>S4 - Robust, but more complicated. Used by Bioconductor. Don’t use it until there’s a good book about it (according to Hadley, there isn’t yet), unless you need it for Bioc.</li>
+<li>R6 - more like OOP in python. Powers reticulate &amp; shiny. Avoid unless you really need it.</li>
+</ul>
+<p>Five chapters in <a href="https://adv-r.hadley.nz/"><code>Advanced R</code></a>.</p>
+<div id="s3-intro" class="section level3">
+<h3>S3 Intro</h3>
+<p>Simplest OOP system that might work. (And it does!)</p>
+<pre class="r"><code>df &lt;- data.frame()
+f &lt;- factor()
+mod &lt;- lm(mpg ~ cyl, data = mtcars)
+# S3
+sloop::otype(df)</code></pre>
+<pre><code>## [1] &quot;S3&quot;</code></pre>
+<pre class="r"><code>sloop::otype(f)</code></pre>
+<pre><code>## [1] &quot;S3&quot;</code></pre>
+<pre class="r"><code>sloop::otype(mod)</code></pre>
+<pre><code>## [1] &quot;S3&quot;</code></pre>
+<pre class="r"><code>sloop::otype(tibble::tibble())</code></pre>
+<pre><code>## [1] &quot;S3&quot;</code></pre>
+<pre class="r"><code>sloop::otype(ggplot2::ggplot())</code></pre>
+<pre><code>## [1] &quot;S3&quot;</code></pre>
+<pre class="r"><code># base
+sloop::otype(1:10)</code></pre>
+<pre><code>## [1] &quot;base&quot;</code></pre>
+<pre class="r"><code>sloop::otype(function(x) x)</code></pre>
+<pre><code>## [1] &quot;base&quot;</code></pre>
+<p>All S3 objects are built on a base object. Use <code>typeof()</code> to find out.</p>
+<pre class="r"><code>typeof(df)</code></pre>
+<pre><code>## [1] &quot;list&quot;</code></pre>
+<pre class="r"><code>typeof(f)</code></pre>
+<pre><code>## [1] &quot;integer&quot;</code></pre>
+<pre class="r"><code>typeof(mod)</code></pre>
+<pre><code>## [1] &quot;list&quot;</code></pre>
+<p>Find out the attributes an S3 object has:</p>
+<pre class="r"><code>attributes(df)</code></pre>
+<pre><code>## $names
+## character(0)
+## 
+## $row.names
+## integer(0)
+## 
+## $class
+## [1] &quot;data.frame&quot;</code></pre>
+</div>
+<div id="why-are-s3-objects-useful" class="section level3">
+<h3>Why are S3 objects useful?</h3>
+<p>Example: the behavior of print depends on the object you give it</p>
+<pre class="r"><code>x &lt;- factor(1:10)
+print(x)</code></pre>
+<pre><code>##  [1] 1  2  3  4  5  6  7  8  9  10
+## Levels: 1 2 3 4 5 6 7 8 9 10</code></pre>
+<pre class="r"><code>class(x) &lt;- &quot;Date&quot;
+attributes(x)</code></pre>
+<pre><code>## $levels
+##  [1] &quot;1&quot;  &quot;2&quot;  &quot;3&quot;  &quot;4&quot;  &quot;5&quot;  &quot;6&quot;  &quot;7&quot;  &quot;8&quot;  &quot;9&quot;  &quot;10&quot;
+## 
+## $class
+## [1] &quot;Date&quot;</code></pre>
+<pre class="r"><code>x</code></pre>
+<pre><code>##  [1] &quot;1970-01-02&quot; &quot;1970-01-03&quot; &quot;1970-01-04&quot; &quot;1970-01-05&quot; &quot;1970-01-06&quot;
+##  [6] &quot;1970-01-07&quot; &quot;1970-01-08&quot; &quot;1970-01-09&quot; &quot;1970-01-10&quot; &quot;1970-01-11&quot;</code></pre>
+<ul>
+<li><code>print()</code> is a generic function. It looks to see what kind of class the function is, then looks for a specific implementation (method) for it.</li>
+<li><code>method()</code> is a specific implementation of a generic function.
+<ul>
+<li>naming convention: <code>{generic}.{class}</code></li>
+</ul></li>
+</ul>
+<pre class="r"><code>sloop::ftype(print)</code></pre>
+<pre><code>## [1] &quot;S3&quot;      &quot;generic&quot;</code></pre>
+<p>Use <code>sloop::s3_dispatch()</code> to find out the method used when a generic is called:</p>
+<pre class="r"><code>x &lt;- factor(1:10)
+print(x)</code></pre>
+<pre><code>##  [1] 1  2  3  4  5  6  7  8  9  10
+## Levels: 1 2 3 4 5 6 7 8 9 10</code></pre>
+<pre class="r"><code>sloop::s3_dispatch(print(x))</code></pre>
+<pre><code>## =&gt; print.factor
+##  * print.default</code></pre>
+<pre class="r"><code>y &lt;- ordered(1:10)
+print(y)</code></pre>
+<pre><code>##  [1] 1  2  3  4  5  6  7  8  9  10
+## Levels: 1 &lt; 2 &lt; 3 &lt; 4 &lt; 5 &lt; 6 &lt; 7 &lt; 8 &lt; 9 &lt; 10</code></pre>
+<pre class="r"><code>sloop::s3_dispatch(print(y))</code></pre>
+<pre><code>##    print.ordered
+## =&gt; print.factor
+##  * print.default</code></pre>
+<p>Print the implementation of the method called by a generic</p>
+<pre class="r"><code>sloop::s3_get_method(print.factor)</code></pre>
+<p>Find the implementation for the print functions for numerics &amp; dates:</p>
+<pre class="r"><code>n &lt;- 10
+class(n)</code></pre>
+<pre><code>## [1] &quot;numeric&quot;</code></pre>
+<pre class="r"><code>sloop::s3_dispatch(print(n))</code></pre>
+<pre><code>##    print.double
+##    print.numeric
+## =&gt; print.default</code></pre>
+<pre class="r"><code>d &lt;- Sys.Date()
+sloop::s3_dispatch(print(d))</code></pre>
+<pre><code>## =&gt; print.Date
+##  * print.default</code></pre>
+<pre class="r"><code>t &lt;- Sys.time()
+sloop::s3_dispatch(print(t))</code></pre>
+<pre><code>## =&gt; print.POSIXct
+##    print.POSIXt
+##  * print.default</code></pre>
+<p>Why override a generic? When you have a complicated object that you want to print nicely for your users.</p>
+</div>
+<div id="how-to-create-an-s3-class" class="section level3">
+<h3>How to create an S3 class</h3>
+<div id="simplest-way-possible" class="section level4">
+<h4>Simplest way possible</h4>
+<pre class="r"><code>foo &lt;- function() {
+  x &lt;- list()
+  class(x) &lt;- &quot;foo&quot;
+  return(x)
+}
+my_foo &lt;- foo()
+my_foo</code></pre>
+<pre><code>## Hello</code></pre>
+</div>
+<div id="best-practices" class="section level4">
+<h4>Best practices</h4>
+<p><a href="https://adv-r.hadley.nz/s3.html">S3 chapter of Advanced R</a></p>
+<p>Defining a print method for class <code>foo</code>:</p>
+<pre class="r"><code>print.foo &lt;- function(x, ...) {
+  cat(&quot;Hello\n&quot;)
+  invisible(x)
+}
+my_foo</code></pre>
+<pre><code>## Hello</code></pre>
+<p><strong>Question</strong>: How to check that your new class name isn’t already taken in base R?</p>
+</div>
+</div>
+<div id="defining-a-new-generic-function" class="section level3">
+<h3>Defining a new generic function</h3>
+<p>Obviate the need for a ton of if clauses to make a function work on different object types.</p>
+<pre class="r"><code>bizarro &lt;- function(x) {
+  UseMethod(&quot;bizarro&quot;)
+}
+str_reverse &lt;- function(x) {
+  purrr::map_chr(stringr::str_split(x, &quot;&quot;), 
+    ~ stringr::str_flatten(rev(.x))  
+  )
+}</code></pre>
+<pre class="r"><code># need to have same function signature as the generic
+bizarro.character &lt;- function(x) {
+  str_reverse(x)
+}
+bizarro.numeric &lt;- function(x) {
+  x * -1
+}
+bizarro.logical &lt;- function(x) {
+  !x
+}
+bizarro.data.frame &lt;- function(x) {
+  colnames(x) &lt;- bizarro(colnames(x))
+  purrr::map(x, bizarro)
+}</code></pre>
+<pre class="r"><code>bizarro(5)</code></pre>
+<pre><code>## [1] -5</code></pre>
+<pre class="r"><code>bizarro(-275)</code></pre>
+<pre><code>## [1] 275</code></pre>
+<pre class="r"><code>bizarro(c(TRUE, FALSE))</code></pre>
+<pre><code>## [1] FALSE  TRUE</code></pre>
+<pre class="r"><code>bizarro(mtcars)</code></pre>
+<pre><code>## $gpm
+##  [1] -21.0 -21.0 -22.8 -21.4 -18.7 -18.1 -14.3 -24.4 -22.8 -19.2 -17.8
+## [12] -16.4 -17.3 -15.2 -10.4 -10.4 -14.7 -32.4 -30.4 -33.9 -21.5 -15.5
+## [23] -15.2 -13.3 -19.2 -27.3 -26.0 -30.4 -15.8 -19.7 -15.0 -21.4
+## 
+## $lyc
+##  [1] -6 -6 -4 -6 -8 -6 -8 -4 -4 -6 -6 -8 -8 -8 -8 -8 -8 -4 -4 -4 -4 -8 -8
+## [24] -8 -8 -4 -4 -4 -8 -6 -8 -4
+## 
+## $psid
+##  [1] -160.0 -160.0 -108.0 -258.0 -360.0 -225.0 -360.0 -146.7 -140.8
+## [10] -167.6 -167.6 -275.8 -275.8 -275.8 -472.0 -460.0 -440.0  -78.7
+## [19]  -75.7  -71.1 -120.1 -318.0 -304.0 -350.0 -400.0  -79.0 -120.3
+## [28]  -95.1 -351.0 -145.0 -301.0 -121.0
+## 
+## $ph
+##  [1] -110 -110  -93 -110 -175 -105 -245  -62  -95 -123 -123 -180 -180
+## [14] -180 -205 -215 -230  -66  -52  -65  -97 -150 -150 -245 -175  -66
+## [27]  -91 -113 -264 -175 -335 -109
+## 
+## $tard
+##  [1] -3.90 -3.90 -3.85 -3.08 -3.15 -2.76 -3.21 -3.69 -3.92 -3.92 -3.92
+## [12] -3.07 -3.07 -3.07 -2.93 -3.00 -3.23 -4.08 -4.93 -4.22 -3.70 -2.76
+## [23] -3.15 -3.73 -3.08 -4.08 -4.43 -3.77 -4.22 -3.62 -3.54 -4.11
+## 
+## $tw
+##  [1] -2.620 -2.875 -2.320 -3.215 -3.440 -3.460 -3.570 -3.190 -3.150
+## [10] -3.440 -3.440 -4.070 -3.730 -3.780 -5.250 -5.424 -5.345 -2.200
+## [19] -1.615 -1.835 -2.465 -3.520 -3.435 -3.840 -3.845 -1.935 -2.140
+## [28] -1.513 -3.170 -2.770 -3.570 -2.780
+## 
+## $cesq
+##  [1] -16.46 -17.02 -18.61 -19.44 -17.02 -20.22 -15.84 -20.00 -22.90
+## [10] -18.30 -18.90 -17.40 -17.60 -18.00 -17.98 -17.82 -17.42 -19.47
+## [19] -18.52 -19.90 -20.01 -16.87 -17.30 -15.41 -17.05 -18.90 -16.70
+## [28] -16.90 -14.50 -15.50 -14.60 -18.60
+## 
+## $sv
+##  [1]  0  0 -1 -1  0 -1  0 -1 -1 -1 -1  0  0  0  0  0  0 -1 -1 -1 -1  0  0
+## [24]  0  0 -1  0 -1  0  0  0 -1
+## 
+## $ma
+##  [1] -1 -1 -1  0  0  0  0  0  0  0  0  0  0  0  0  0  0 -1 -1 -1  0  0  0
+## [24]  0  0 -1 -1 -1 -1 -1 -1 -1
+## 
+## $raeg
+##  [1] -4 -4 -4 -3 -3 -3 -3 -4 -4 -4 -4 -3 -3 -3 -3 -3 -3 -4 -4 -4 -3 -3 -3
+## [24] -3 -3 -4 -5 -5 -5 -5 -5 -4
+## 
+## $brac
+##  [1] -4 -4 -1 -1 -2 -1 -4 -2 -2 -4 -4 -3 -3 -3 -4 -4 -4 -1 -2 -1 -1 -2 -2
+## [24] -4 -2 -1 -2 -2 -4 -6 -8 -2</code></pre>
+</div>
+</div>
+<div id="using-data-in-packages" class="section level2">
+<h2>Using data in packages</h2>
 </div>
 
 

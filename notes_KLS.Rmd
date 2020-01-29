@@ -35,20 +35,22 @@ library(dplyr)
 data.frame(env=search(), path=searchpaths())
 ```
 
-## R setup stuff to make your life easier
+### R setup 
 
-### Open .Rprofile
+Stuff to make your life easier
+
+#### Open .Rprofile
 ```{r}
 usethis::edit_r_profile()
 ```
 
-### Require devtools in your .Rprofile
+#### Require devtools in your .Rprofile
 ```{r}
 usethis::use_devtools()
 usethis::use_partial_warnings()
 ```
 
-### Tell usethis about yourself
+#### Tell usethis about yourself
 
 In your .Rprofile:
 
@@ -66,7 +68,7 @@ options(
 
 See [`usethis` setup docs](https://usethis.r-lib.org/articles/articles/usethis-setup.html)
 
-### Restart R completely fresh with an empty environment OFTEN
+#### Restart R completely fresh with an empty environment OFTEN
 
 Options in global settings:
 - Don't Restore `.RData` at startup
@@ -75,7 +77,7 @@ Options in global settings:
 Better for reproducibility. 
 [Also prevents fires!](https://twitter.com/hadleywickham/status/940021008764846080)
 
-### My .Rprofile now looks like this:
+#### My .Rprofile now looks like this:
 
 ```{r Rprofile}
 if (interactive()) {
@@ -98,26 +100,28 @@ options(
 )
 ```
 
-### sitrep functions
+#### sitrep functions
 
-#### project sitrep
+##### project sitrep
 ```{r}
 usethis::proj_sitrep()
 ```
 
-#### Add `.RData` & `.DS_Store` to `.gitignore`
+##### Add `.RData` & `.DS_Store` to `.gitignore`
 ```{r}
 usethis::git_vaccinate() 
 ```
 
-#### git sitrep
+##### git sitrep
 ```{r}
 usethis::git_sitrep()
 ```
 
-## What bulding a package looks like from start to finish
+## The Whole Game
 
-["The Whole Game"](https://r-pkgs.org/whole-game.html)
+What bulding a package looks like from start to finish
+
+R Packages chapter: ["The Whole Game"](https://r-pkgs.org/whole-game.html)
 
 ### Create a new, empty package
 ```{r create_package}
@@ -1100,4 +1104,163 @@ Hadley's greatest shame: `dplyr::recode`:
 df %>% mutate(new = old)  # how almost everything does it
 df %>% rename(new = old)
 df %>% recode(old = new)  # recode flips new & old
+```
+
+## Object-oriented programming
+
+- Base types - `typeof()`
+- S3 - Simplest system of OOP. Longest history. Add attributes to a base object. Most important attribute `class`.
+- S4 - Robust, but more complicated. Used by Bioconductor. Don't use it until there's a good book about it (according to Hadley, there isn't yet), unless you need it for Bioc.
+- R6 - more like OOP in python. Powers reticulate & shiny. Avoid unless you really need it.
+
+Five chapters in [`Advanced R`](https://adv-r.hadley.nz/).
+
+### S3 Intro
+
+Simplest OOP system that might work. (And it does!)
+
+```{r, eval=TRUE}
+df <- data.frame()
+f <- factor()
+mod <- lm(mpg ~ cyl, data = mtcars)
+# S3
+sloop::otype(df)
+sloop::otype(f)
+sloop::otype(mod)
+sloop::otype(tibble::tibble())
+sloop::otype(ggplot2::ggplot())
+# base
+sloop::otype(1:10)
+sloop::otype(function(x) x)
+```
+
+All S3 objects are built on a base object. Use `typeof()` to find out.
+```{r, eval=TRUE}
+typeof(df)
+typeof(f)
+typeof(mod)
+```
+
+Find out the attributes an S3 object has:
+```{r, eval=TRUE}
+attributes(df)
+```
+
+### Why are S3 objects useful?
+
+Example: the behavior of print depends on the object you give it
+```{r, eval=TRUE}
+x <- factor(1:10)
+print(x)
+
+class(x) <- "Date"
+attributes(x)
+x
+```
+
+- `print()` is a generic function. It looks to see what kind of class the function is, then looks for a specific implementation (method) for it.
+- `method()` is a specific implementation of a generic function.
+  - naming convention: `{generic}.{class}`
+```{r, eval=TRUE}
+sloop::ftype(print)
+```
+
+Use `sloop::s3_dispatch()` to find out the method used when a generic is called:
+```{r, eval=TRUE}
+x <- factor(1:10)
+print(x)
+sloop::s3_dispatch(print(x))
+```
+```{r, eval=TRUE}
+y <- ordered(1:10)
+print(y)
+sloop::s3_dispatch(print(y))
+```
+
+Print the implementation of the method called by a generic
+```{r}
+sloop::s3_get_method(print.factor)
+```
+
+Find the implementation for the print functions for numerics & dates:
+```{r, eval=TRUE}
+n <- 10
+class(n)
+sloop::s3_dispatch(print(n))
+```
+```{r, eval=TRUE}
+d <- Sys.Date()
+sloop::s3_dispatch(print(d))
+t <- Sys.time()
+sloop::s3_dispatch(print(t))
+```
+
+Why override a generic? When you have a complicated object that you want to print nicely for your users.
+
+### How to create an S3 class
+
+#### Simplest way possible
+
+```{r, eval=TRUE}
+foo <- function() {
+  x <- list()
+  class(x) <- "foo"
+  return(x)
+}
+my_foo <- foo()
+my_foo
+```
+
+#### Best practices
+
+[S3 chapter of Advanced R](https://adv-r.hadley.nz/s3.html)
+
+Defining a print method for class `foo`:
+```{r, eval=TRUE}
+print.foo <- function(x, ...) {
+  cat("Hello\n")
+  invisible(x)
+}
+my_foo
+```
+
+**Question**: How to check that your new class name isn't already taken in base R?
+
+### Defining a new generic function
+
+Obviate the need for a ton of if clauses to make a function work on different object types.
+
+```{r generic, eval=TRUE}
+bizarro <- function(x) {
+  UseMethod("bizarro")
+}
+str_reverse <- function(x) {
+  purrr::map_chr(stringr::str_split(x, ""), 
+    ~ stringr::str_flatten(rev(.x))  
+  )
+}
+```
+
+```{r methods, eval=TRUE}
+# need to have same function signature as the generic
+bizarro.character <- function(x) {
+  str_reverse(x)
+}
+bizarro.numeric <- function(x) {
+  x * -1
+}
+bizarro.logical <- function(x) {
+  !x
+}
+bizarro.data.frame <- function(x) {
+  colnames(x) <- bizarro(colnames(x))
+  purrr::map(x, bizarro)
+}
+```
+
+```{r, eval=TRUE}
+bizarro(5)
+bizarro(-275)
+bizarro(c(TRUE, FALSE))
+bizarro(mtcars)
 ```
