@@ -72,6 +72,7 @@ See [`usethis` setup docs](https://usethis.r-lib.org/articles/articles/usethis-s
 #### Restart R completely fresh with an empty environment OFTEN
 
 Options in global settings:
+
 - Don't Restore `.RData` at startup
 - Don't save your workspace on exit
 
@@ -193,7 +194,9 @@ devtools::check()
 
 If everything worked, we're ready to install the package.
 
-### Install the package as if it were on CRAN or GitHub
+### Install the package 
+
+as if it were on CRAN or GitHub
 
 ```{r install}
 devtools::install()
@@ -397,7 +400,7 @@ devtools::test()
 
 It works!
 
-### What about bad inputs?
+#### What about bad inputs?
 
 Throw errors; fail fast.
 
@@ -510,9 +513,7 @@ my_sd(x)
 # 10
 ```
 
-### Warm-ups
-
-### Lexical scoping
+#### Lexical scoping
 
 If R can't find the variable in the current environment, 
 it goes up a level until it can.
@@ -853,15 +854,15 @@ Hadley: the two curly braces are magic, they don't live anywhere. They are inter
 
 ## Interface
 
-- interface: outside of function
-- implementation: inside of function
+- **Interface**: outside of function
+- **Implementation**: inside of function
 
-- The Tidyverse tries to have consistent interfaces across their function designs.
+The Tidyverse tries to have consistent interfaces across their function designs.
 - Book in progress: [Tidyverse design guide](https://design.tidyverse.org/)
   - Probably at least 3 years away from completion.
   - When they discover a recurring pattern, they document it.
   
-What are the properties of a function that define its interface (there are >= 9)?
+#### What are the properties of a function that define its interface (there are >= 9)?
 
 - Name of the function
 - Params / arguments / inputs
@@ -882,7 +883,7 @@ What are the properties of a function that define its interface (there are >= 9)
   - change the random seed
 - Environment that it's in?
 
-### Case study: regular expressions / string manipulation
+#### Case study: regular expressions / string manipulation
 
 `stringr` vs. base R
 

@@ -1558,7 +1558,11 @@ usethis::use_partial_warnings()</code></pre>
 </div>
 <div id="restart-r-completely-fresh-with-an-empty-environment-often" class="section level4">
 <h4>Restart R completely fresh with an empty environment OFTEN</h4>
-<p>Options in global settings: - Don’t Restore <code>.RData</code> at startup - Don’t save your workspace on exit</p>
+<p>Options in global settings:</p>
+<ul>
+<li>Don’t Restore <code>.RData</code> at startup</li>
+<li>Don’t save your workspace on exit</li>
+</ul>
 <p>Better for reproducibility. <a href="https://twitter.com/hadleywickham/status/940021008764846080">Also prevents fires!</a></p>
 </div>
 <div id="my-.rprofile-now-looks-like-this" class="section level4">
@@ -1649,8 +1653,9 @@ options(
 <p>If everything worked, we’re ready to install the package.</p>
 </div>
 </div>
-<div id="install-the-package-as-if-it-were-on-cran-or-github" class="section level3">
-<h3>Install the package as if it were on CRAN or GitHub</h3>
+<div id="install-the-package" class="section level3">
+<h3>Install the package</h3>
+<p>as if it were on CRAN or GitHub</p>
 <pre class="r"><code>devtools::install()</code></pre>
 <p>Now you can use library!</p>
 <pre class="r"><code>library(foofactors)</code></pre>
@@ -1796,11 +1801,11 @@ usethis::use_coverage()</code></pre>
 <pre class="r"><code>devtools::test()</code></pre>
 <p>It works!</p>
 </div>
-</div>
-<div id="what-about-bad-inputs" class="section level3">
-<h3>What about bad inputs?</h3>
+<div id="what-about-bad-inputs" class="section level4">
+<h4>What about bad inputs?</h4>
 <p>Throw errors; fail fast.</p>
 <p><em><strong>The hardest part about testing is writing the tests.</strong></em></p>
+</div>
 </div>
 </div>
 <div id="document-and-share" class="section level2">
@@ -1887,13 +1892,10 @@ my_sd &lt;- function(x) sqrt(var(x))
 my_sd(x)</code></pre>
 <pre><code>## [1] 10</code></pre>
 <pre class="r"><code># 10</code></pre>
-</div>
-<div id="warm-ups" class="section level3">
-<h3>Warm-ups</h3>
-</div>
-<div id="lexical-scoping" class="section level3">
-<h3>Lexical scoping</h3>
+<div id="lexical-scoping" class="section level4">
+<h4>Lexical scoping</h4>
 <p>If R can’t find the variable in the current environment, it goes up a level until it can.</p>
+</div>
 </div>
 <div id="environments" class="section level3">
 <h3>Environments</h3>
@@ -1928,12 +1930,12 @@ e$a</code></pre>
 <pre><code>## [1] 1</code></pre>
 <pre class="r"><code>#e[[1]] # doesn&#39;t work; unordered
 lobstr::obj_addr(e)</code></pre>
-<pre><code>## [1] &quot;0x7fcc5663f3f8&quot;</code></pre>
+<pre><code>## [1] &quot;0x7fcc5ea95568&quot;</code></pre>
 <pre class="r"><code>e$e &lt;- e  
 e$e</code></pre>
-<pre><code>## &lt;environment: 0x7fcc5663f3f8&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc5ea95568&gt;</code></pre>
 <pre class="r"><code>lobstr::obj_addr(e)  # e didn&#39;t get overwritten</code></pre>
-<pre><code>## [1] &quot;0x7fcc5663f3f8&quot;</code></pre>
+<pre><code>## [1] &quot;0x7fcc5ea95568&quot;</code></pre>
 <pre class="r"><code>## list
 l = list(a=1)
 l$l &lt;- l  # original list got overwritten
@@ -1945,9 +1947,9 @@ l</code></pre>
 ## $l$a
 ## [1] 1</code></pre>
 <pre class="r"><code>e</code></pre>
-<pre><code>## &lt;environment: 0x7fcc5663f3f8&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc5ea95568&gt;</code></pre>
 <pre class="r"><code>str(e)</code></pre>
-<pre><code>## &lt;environment: 0x7fcc5663f3f8&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc5ea95568&gt;</code></pre>
 <pre class="r"><code>ls(e)</code></pre>
 <pre><code>## [1] &quot;a&quot; &quot;e&quot;</code></pre>
 <pre class="r"><code>names(e)</code></pre>
@@ -1957,9 +1959,9 @@ l</code></pre>
 <pre class="r"><code>str(as.list(e))</code></pre>
 <pre><code>## List of 2
 ##  $ a: num 1
-##  $ e:&lt;environment: 0x7fcc5663f3f8&gt;</code></pre>
+##  $ e:&lt;environment: 0x7fcc5ea95568&gt;</code></pre>
 <pre class="r"><code>env_print(e)</code></pre>
-<pre><code>## &lt;environment: 0x7fcc5663f3f8&gt;
+<pre><code>## &lt;environment: 0x7fcc5ea95568&gt;
 ## parent: &lt;environment: global&gt;
 ## bindings:
 ##  * a: &lt;dbl&gt;
@@ -2004,7 +2006,7 @@ find_var(&quot;b&quot;, e1)
   }
 }
 find_env(&quot;a&quot;, e)</code></pre>
-<pre><code>## &lt;environment: 0x7fcc5663f3f8&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc5ea95568&gt;</code></pre>
 <pre class="r"><code># Returns e1
 find_env(&quot;find_env&quot;, e)</code></pre>
 <pre><code>## &lt;environment: R_GlobalEnv&gt;</code></pre>
@@ -2319,16 +2321,12 @@ starwars[starwars$homeworld == &quot;Naboo&quot; &amp; starwars$species == &quot
 <div id="interface" class="section level2">
 <h2>Interface</h2>
 <ul>
-<li><p>interface: outside of function</p></li>
-<li><p>implementation: inside of function</p></li>
-<li><p>The Tidyverse tries to have consistent interfaces across their function designs.</p></li>
-<li><p>Book in progress: <a href="https://design.tidyverse.org/">Tidyverse design guide</a></p>
-<ul>
-<li>Probably at least 3 years away from completion.</li>
-<li>When they discover a recurring pattern, they document it.</li>
-</ul></li>
+<li><strong>Interface</strong>: outside of function</li>
+<li><strong>Implementation</strong>: inside of function</li>
 </ul>
-<p>What are the properties of a function that define its interface (there are &gt;= 9)?</p>
+<p>The Tidyverse tries to have consistent interfaces across their function designs. - Book in progress: <a href="https://design.tidyverse.org/">Tidyverse design guide</a> - Probably at least 3 years away from completion. - When they discover a recurring pattern, they document it.</p>
+<div id="what-are-the-properties-of-a-function-that-define-its-interface-there-are-9" class="section level4">
+<h4>What are the properties of a function that define its interface (there are &gt;= 9)?</h4>
 <ul>
 <li>Name of the function</li>
 <li>Params / arguments / inputs
@@ -2355,8 +2353,9 @@ starwars[starwars$homeworld == &quot;Naboo&quot; &amp; starwars$species == &quot
 </ul></li>
 <li>Environment that it’s in?</li>
 </ul>
-<div id="case-study-regular-expressions-string-manipulation" class="section level3">
-<h3>Case study: regular expressions / string manipulation</h3>
+</div>
+<div id="case-study-regular-expressions-string-manipulation" class="section level4">
+<h4>Case study: regular expressions / string manipulation</h4>
 <p><code>stringr</code> vs. base R</p>
 <p>Lots of inconsistencies in the interfaces for base R functions related to regex &amp; string manipulation.</p>
 </div>
