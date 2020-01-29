@@ -14,8 +14,9 @@ rmarkdown::render('notes_KLS.Rmd', output_file="docs/index.html")
 Taught by Charlotte & Hadley Wickham at `rstudio::conf(2020)`.
 
 - Repo with workshop materials: [https://github.com/rstudio-conf-2020/build-tidy-tools](https://github.com/rstudio-conf-2020/build-tidy-tools)
-- [RStudio Community Thread](https://community.rstudio.com/t/building-tidy-tools-workshop-rstudio-conf-2020/49091)
+- [RStudio Community Thread for this workshop](https://community.rstudio.com/t/building-tidy-tools-workshop-rstudio-conf-2020/49091)
 - 2nd edition of Hadley's [R Packages book](https://r-pkgs.org/index.html)
+- [Package Development category in RStudio Community](https://community.rstudio.com/c/package-development)
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, eval=FALSE, error=TRUE)

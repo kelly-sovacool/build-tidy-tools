@@ -1519,8 +1519,9 @@ div.tocify {
 <p>Taught by Charlotte &amp; Hadley Wickham at <code>rstudio::conf(2020)</code>.</p>
 <ul>
 <li>Repo with workshop materials: <a href="https://github.com/rstudio-conf-2020/build-tidy-tools">https://github.com/rstudio-conf-2020/build-tidy-tools</a></li>
-<li><a href="https://community.rstudio.com/t/building-tidy-tools-workshop-rstudio-conf-2020/49091">RStudio Community Thread</a></li>
+<li><a href="https://community.rstudio.com/t/building-tidy-tools-workshop-rstudio-conf-2020/49091">RStudio Community Thread for this workshop</a></li>
 <li>2nd edition of Hadley’s <a href="https://r-pkgs.org/index.html">R Packages book</a></li>
+<li><a href="https://community.rstudio.com/c/package-development">Package Development category in RStudio Community</a></li>
 </ul>
 <div id="libraries-packages" class="section level2">
 <h2>Libraries &amp; Packages</h2>
@@ -1927,12 +1928,12 @@ e$a</code></pre>
 <pre><code>## [1] 1</code></pre>
 <pre class="r"><code>#e[[1]] # doesn&#39;t work; unordered
 lobstr::obj_addr(e)</code></pre>
-<pre><code>## [1] &quot;0x7fcc5f78fd80&quot;</code></pre>
+<pre><code>## [1] &quot;0x7fcc5663f3f8&quot;</code></pre>
 <pre class="r"><code>e$e &lt;- e  
 e$e</code></pre>
-<pre><code>## &lt;environment: 0x7fcc5f78fd80&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc5663f3f8&gt;</code></pre>
 <pre class="r"><code>lobstr::obj_addr(e)  # e didn&#39;t get overwritten</code></pre>
-<pre><code>## [1] &quot;0x7fcc5f78fd80&quot;</code></pre>
+<pre><code>## [1] &quot;0x7fcc5663f3f8&quot;</code></pre>
 <pre class="r"><code>## list
 l = list(a=1)
 l$l &lt;- l  # original list got overwritten
@@ -1944,9 +1945,9 @@ l</code></pre>
 ## $l$a
 ## [1] 1</code></pre>
 <pre class="r"><code>e</code></pre>
-<pre><code>## &lt;environment: 0x7fcc5f78fd80&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc5663f3f8&gt;</code></pre>
 <pre class="r"><code>str(e)</code></pre>
-<pre><code>## &lt;environment: 0x7fcc5f78fd80&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc5663f3f8&gt;</code></pre>
 <pre class="r"><code>ls(e)</code></pre>
 <pre><code>## [1] &quot;a&quot; &quot;e&quot;</code></pre>
 <pre class="r"><code>names(e)</code></pre>
@@ -1956,9 +1957,9 @@ l</code></pre>
 <pre class="r"><code>str(as.list(e))</code></pre>
 <pre><code>## List of 2
 ##  $ a: num 1
-##  $ e:&lt;environment: 0x7fcc5f78fd80&gt;</code></pre>
+##  $ e:&lt;environment: 0x7fcc5663f3f8&gt;</code></pre>
 <pre class="r"><code>env_print(e)</code></pre>
-<pre><code>## &lt;environment: 0x7fcc5f78fd80&gt;
+<pre><code>## &lt;environment: 0x7fcc5663f3f8&gt;
 ## parent: &lt;environment: global&gt;
 ## bindings:
 ##  * a: &lt;dbl&gt;
@@ -2003,7 +2004,7 @@ find_var(&quot;b&quot;, e1)
   }
 }
 find_env(&quot;a&quot;, e)</code></pre>
-<pre><code>## &lt;environment: 0x7fcc5f78fd80&gt;</code></pre>
+<pre><code>## &lt;environment: 0x7fcc5663f3f8&gt;</code></pre>
 <pre class="r"><code># Returns e1
 find_env(&quot;find_env&quot;, e)</code></pre>
 <pre><code>## &lt;environment: R_GlobalEnv&gt;</code></pre>
